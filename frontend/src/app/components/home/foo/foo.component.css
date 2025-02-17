@@ -1,0 +1,20 @@
+.footer {
+  width: 100%; /* Asegura que ocupe todo el ancho */
+  background-color: #0f0e17;/* Misma combinación que el navbar */
+  color: #fffffe;
+  display: flex;
+  justify-content: space-between;
+ 
+  font-size: 14px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Opcional: añade una sombra */
+}
+
+.footer a {
+  color: #fffffe;
+  text-decoration: none; /* Sin subrayado */
+}
+
+.footer mat-icon {
+  color: #fffffe;
+  font-size: 24px;
+}

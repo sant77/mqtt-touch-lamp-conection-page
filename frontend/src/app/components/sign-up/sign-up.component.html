@@ -1,0 +1,27 @@
+<div class="container">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <h1>Registrarse</h1>
+    <mat-form-field appearance="fill">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" type="text" placeholder="Ingresa tu nombre">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" placeholder="Ingresa tu correo">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Contraseña</mat-label>
+      <input matInput formControlName="password" type="password" placeholder="Ingresa tu contraseña">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Confirmar Contraseña</mat-label>
+      <input matInput formControlName="password2" type="password2" placeholder="Ingresa tu contraseña">
+    </mat-form-field>
+    <button class="cta-button"  type="submit">Registrarse</button>
+  </form>
+
+  <!-- Mostrar mensaje de error -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+</div>

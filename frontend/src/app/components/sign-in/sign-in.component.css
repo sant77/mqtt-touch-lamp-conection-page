@@ -1,0 +1,42 @@
+/* Estilo base para centrar el formulario */
+.container {
+  display: flex;
+  flex-direction: column; /* Alinea los elementos del formulario verticalmente */
+  justify-content: center; /* Centra el contenido verticalmente */
+  align-items: center; /* Centra el contenido horizontalmente */
+  height: 100vh; /* Toma el 100% de la altura de la ventana */
+  background-color: #0f0e17; /* Fondo claro para mejorar la legibilidad */
+  min-width: 100%;
+ 
+}
+
+form {
+  width: 100%;
+  text-align: center;
+  max-width: 400px; /* Define un ancho máximo para el formulario */
+  padding: 20px;
+  border: 1px solid #d7e3ff; /* Borde con color similar al tema */
+  border-radius: 8px; /* Bordes redondeados */
+  background-color: #fffffe; /* Fondo blanco */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  color: #0f0e17;
+}
+
+mat-form-field {
+  width: 100%;
+}
+  .cta-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    color: #fffffe;
+    background-color: #ff8906;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+  }
+  
+  .cta-button:hover {
+    background-color: #0056b3;
+  }

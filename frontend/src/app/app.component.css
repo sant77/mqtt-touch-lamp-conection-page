@@ -1,0 +1,19 @@
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  min-height: 100vh; /* Altura total del viewport */
+  
+}
+
+.content {
+  flex: 1; /* Rellena el espacio disponible */
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  text-align: center; /* Opcional: centra el texto dentro del contenido */
+  padding: 20px; /* Opcional: añade espacio alrededor */
+}
+
+

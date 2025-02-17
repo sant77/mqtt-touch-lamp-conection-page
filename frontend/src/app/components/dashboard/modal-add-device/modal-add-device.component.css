@@ -1,0 +1,63 @@
+/* Center the dialog title */
+h2.mat-dialog-title {
+    text-align: center;
+    color: #3f51b5; /* Material primary color */
+    margin-bottom: 20px;
+  }
+  
+  /* Style the form container */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Add spacing between form fields */
+  }
+  
+  /* Style the form fields */
+  mat-form-field {
+    width: 100%; /* Make form fields take full width */
+    margin-top: 10%;
+  }
+  
+  /* Style the input fields */
+  input.mat-input-element,
+  textarea.mat-input-element {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  /* Style the buttons in the dialog actions */
+  mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 10px; /* Add spacing between buttons */
+    padding: 16px 0;
+    margin-right: 10px;
+  }
+  
+  /* Style the Save button */
+  button[mat-button][color="primary"] {
+    background-color: #3f51b5; /* Material primary color */
+    color: white;
+    border-radius: 4px;
+    padding: 8px 16px;
+  }
+  
+  /* Style the Cancel button */
+  button[mat-button]:not([color="primary"]) {
+    color: #3f51b5; /* Material primary color */
+    border: 1px solid #3f51b5;
+    border-radius: 4px;
+    padding: 8px 16px;
+  }
+  
+  /* Hover effect for buttons */
+  button[mat-button]:hover {
+    opacity: 0.9;
+  }
+  
+  /* Disabled button style */
+  button[mat-button][disabled] {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+  }

@@ -1,0 +1,17 @@
+<div class="container">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <h1>Iniciar sesión</h1>
+      <mat-form-field appearance="fill">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="Email" type="email" placeholder="Ingresa tu correo">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Contraseña</mat-label>
+        <input matInput formControlName="password" type="password" placeholder="Ingresa tu contraseña">
+      </mat-form-field>
+      <button class="cta-button" color="primary" type="submit">Iniciar sesión</button>
+    </form>
+  
+
+</div>
+  

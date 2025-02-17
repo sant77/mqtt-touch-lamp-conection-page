@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>Agregar dispositivo</h2>
+<mat-dialog-content>
+  <form [formGroup]="formulario">
+    <mat-form-field appearance="outline">
+      <mat-label>Dispositivos</mat-label>
+      <mat-select formControlName="deviceType">
+        <mat-option *ngFor="let type of deviceTypes" [value]="type.name">
+          {{ type.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="dialogRef.close()">Cancelar</button>
+  <button mat-button color="primary" (click)="enviarFormulario()" [disabled]="formulario.invalid">Agregar</button>
+</mat-dialog-actions>

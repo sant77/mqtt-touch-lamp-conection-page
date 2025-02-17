@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Agregar conexión</h2>
+<mat-dialog-content>
+  <form [formGroup]="formulario">
+    <mat-form-field appearance="outline">
+      <mat-label>Usuario</mat-label>
+      <input type="text" matInput [formControlName]="'user'" [matAutocomplete]="autoUser">
+      <mat-autocomplete #autoUser="matAutocomplete" (optionSelected)="onUserSelected($event.option.value)">
+        <mat-option *ngFor="let user of filteredUsers | async" [value]="user.email">
+          {{ user.email }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" *ngIf="devices.length > 0">
+      <mat-label>Dispositivo</mat-label>
+      <input type="text" matInput [formControlName]="'device'" [matAutocomplete]="autoDevice">
+      <mat-autocomplete #autoDevice="matAutocomplete" (optionSelected)="ondeviceSelected($event.option.value)">
+        <mat-option *ngFor="let device of filteredDevices | async" [value]="device.nombre">
+          {{ device.nombre }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" *ngIf="devicesOwnUser.length > 0">
+      <mat-label>Dispositivo usuario</mat-label>
+      <input type="text" matInput [formControlName]="'deviceOwner'" [matAutocomplete]="autoDevice">
+      <mat-autocomplete #autoDevice="matAutocomplete" (optionSelected)="onOwndeviceSelected($event.option.value)">
+        <mat-option *ngFor="let deviceOwner of filteredDevicesOwnUser | async" [value]="deviceOwner.nombre">
+          {{ deviceOwner.nombre }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="dialogRef.close()">Cancelar</button>
+  <button mat-button color="primary" (click)="enviarFormulario()" [disabled]="formulario.invalid">Agregar</button>
+</mat-dialog-actions>
