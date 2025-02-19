@@ -1,5 +1,6 @@
 version: '3.8'
 services:
+
   mysql:
     image: mysql:8.0
     container_name: mysql_container
@@ -14,5 +15,24 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  backend_user:
+    build:
+      context: ../userService
+      dockerfile: Dockerfile
+    container_name: backend_user
+    ports:
+      - "5131:5131"
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "80:80"
+    
 volumes:
   mysql_data:
+  
+
+

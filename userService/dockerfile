@@ -1,0 +1,22 @@
+# Usar la imagen base de .NET SDK para compilar la aplicación
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copiar los archivos del proyecto y restaurar dependencias
+COPY . .
+RUN dotnet restore
+
+# Publicar la aplicación
+RUN dotnet publish -c Release -o /app
+
+# Usar la imagen base de .NET Runtime para ejecutar la aplicación
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+# Copiar los archivos publicados desde la etapa de compilación
+COPY --from=build /app .
+
+# Comando para ejecutar la aplicación
+ENTRYPOINT ["dotnet", "backend-user.dll"]
+
+
