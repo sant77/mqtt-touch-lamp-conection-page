@@ -20,6 +20,8 @@ services:
       context: ../userService
       dockerfile: Dockerfile
     container_name: backend_user
+    environment:
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-Server=mysql;Database=user_data;User=root;Password=root_password;}
     ports:
       - "5131:5131"
 
@@ -28,6 +30,8 @@ services:
       context: ../frontend
       dockerfile: Dockerfile
     container_name: frontend
+    environment:
+      - NG_APP_ADDRESS=${NG_APP_ADDRESS:-backend_user}
     ports:
       - "80:80"
     

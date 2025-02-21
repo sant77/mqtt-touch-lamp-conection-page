@@ -6,8 +6,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class LoginUser {
-  private apiUrl = ' http://localhost:5131/api/user/login'; // Ajusta la URL según tu API
+  address = import.meta.env.NG_APP_ADDRESS;
 
+  private apiUrl: string = `http://${this.address}:5131/api/user/login`;
+    
   constructor(private http: HttpClient) {}
 
   login(data: any): Observable<any> {

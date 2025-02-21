@@ -59,10 +59,11 @@ export class DashboardComponent {
   faPlugCircleCheck = faPlugCircleCheck;
   device_relation_user: UserDeviceRelation[] = [];
   relation_user: UserConection[] = [];
+  address = import.meta.env.NG_APP_ADDRESS;
+  address_complete: string = `http://${this.address}:5131/api/`;
   
   constructor(private dialog: MatDialog, private http: HttpClient) {}
-
-
+  
   ngOnInit(): void {
     this.getDeviceUserRelaions();
     this.getUserRelations();
@@ -81,7 +82,7 @@ export class DashboardComponent {
       'Authorization': `Bearer ${token}` // Incluir el token en el encabezado
     });
   
-    this.http.get<any[]>('http://localhost:5131/api/DeviceUserRelation/by-user', { headers }).subscribe(
+    this.http.get<any[]>(`{address_complete}DeviceUserRelation/by-user`, { headers }).subscribe(
       (data) => {
         this.device_relation_user = data; // Asignamos los datos obtenidos a device_relation_user
         this.dataSourceDevice = this.device_relation_user; // Actualizamos dataSourceDevice
@@ -107,7 +108,7 @@ export class DashboardComponent {
       'Authorization': `Bearer ${token}` // Incluir el token en el encabezado
     });
   
-    this.http.get<any[]>('http://localhost:5131/api/DeviceUserRelation/by-user', { headers }).subscribe(
+    this.http.get<any[]>(`{address_complete}DeviceUserRelation/by-user`, { headers }).subscribe(
       (data) => {
         this.device_relation_user = data; // Asignamos los datos obtenidos a device_relation_user
         this.dataSourceDevice = this.device_relation_user; // Actualizamos dataSourceDevice
@@ -133,7 +134,7 @@ export class DashboardComponent {
       'Authorization': `Bearer ${token}` // Incluir el token en el encabezado
     });
   
-    this.http.get<any[]>('http://localhost:5131/api/RelationUser/by-user', { headers }).subscribe(
+    this.http.get<any[]>(`${this.address_complete}RelationUser/by-user`, { headers }).subscribe(
       (data) => {
         this.relation_user = data; // Asignamos los datos obtenidos a device_relation_user
         this.dataSource = this.relation_user; // Actualizamos dataSourceDevice
@@ -159,7 +160,7 @@ export class DashboardComponent {
       'Authorization': `Bearer ${token}` // Incluir el token en el encabezado
     });
   
-    this.http.get<any[]>('http://localhost:5131/api/RelationUser/by-user', { headers }).subscribe(
+    this.http.get<any[]>(`${this.address_complete}RelationUser/by-user`, { headers }).subscribe(
       (data) => {
         this.relation_user = data; // Asignamos los datos obtenidos a device_relation_user
         this.dataSource = this.relation_user; // Actualizamos dataSourceDevice
@@ -247,7 +248,7 @@ export class DashboardComponent {
       'Authorization': `Bearer ${token}` // Incluir el token en el encabezado
     });
 
-    var url_delete = 'http://localhost:5131/api/DeviceUserRelation/' + this.device_relation_user[this.dataSourceDevice.indexOf(row)]["id"]
+    var url_delete = `${this.address_complete}DeviceUserRelation/` + this.device_relation_user[this.dataSourceDevice.indexOf(row)]["id"]
   
     this.http.delete<any[]>(url_delete, { headers }).subscribe(
       (data) => {
@@ -279,7 +280,7 @@ export class DashboardComponent {
       'Authorization': `Bearer ${token}` // Incluir el token en el encabezado
     });
 
-    var url_delete = 'http://localhost:5131/api/RelationUser/' + this.relation_user[this.dataSource.indexOf(row)]["id"]
+    var url_delete = `${this.address_complete}/RelationUser/` + this.relation_user[this.dataSource.indexOf(row)]["id"]
   
     this.http.delete<any[]>(url_delete, { headers }).subscribe(
       (data) => {

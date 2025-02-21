@@ -48,6 +48,9 @@ export class ModalAddConectionComponent {
   devices: any[] = [];
   devicesOwnUser: any[] = [];
 
+  address = import.meta.env.NG_APP_ADDRESS;
+  address_complete: string = `http://${this.address}:5131/api/`
+
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
@@ -93,7 +96,7 @@ export class ModalAddConectionComponent {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.get<any[]>('http://localhost:5131/api/user/all', { headers }).subscribe(
+    this.http.get<any[]>(`${this.address_complete}user/all`, { headers }).subscribe(
       (data) => {
         this.users = data;
         console.log(this.users);
@@ -133,7 +136,7 @@ export class ModalAddConectionComponent {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.get<any[]>(`http://localhost:5131/api/DeviceUserRelation/by-email?email=${userEmail}`, { headers }).subscribe(
+    this.http.get<any[]>(`${this.address_complete}DeviceUserRelation/by-email?email=${userEmail}`, { headers }).subscribe(
       (data) => {
         this.devices = data;
         console.log(this.devices);
@@ -164,7 +167,7 @@ export class ModalAddConectionComponent {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.get<any[]>(`http://localhost:5131/api/DeviceUserRelation/by-user`, { headers }).subscribe(
+    this.http.get<any[]>(`${this.address_complete}DeviceUserRelation/by-user`, { headers }).subscribe(
       (data) => {
         this.devicesOwnUser = data;
         console.log(this.devicesOwnUser);
@@ -209,7 +212,7 @@ export class ModalAddConectionComponent {
               user: this.formulario.get('user')?.value
             };
         
-            this.http.post('http://localhost:5131/api/RelationUser/create-relation', formValue, { headers })
+            this.http.post(`${this.address_complete}RelationUser/create-relation`, formValue, { headers })
               .subscribe(
                 (response) => {
                   console.log('Relación creada exitosamente', response);

@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class RegisterUser {
-  private apiUrl = ' http://localhost:5131/api/user'; // Ajusta la URL según tu API
+  address = import.meta.env.NG_APP_ADDRESS;
+  private apiUrl: string = `http://${this.address}:5131/api/user`;
 
   constructor(private http: HttpClient) {}
 

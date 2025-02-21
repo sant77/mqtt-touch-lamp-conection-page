@@ -17,8 +17,13 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Obtener la cadena de conexión desde la variable de entorno
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+
 // Configurar Entity Framework y MySQL
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 

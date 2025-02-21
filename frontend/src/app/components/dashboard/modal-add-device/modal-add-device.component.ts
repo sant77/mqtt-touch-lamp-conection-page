@@ -38,6 +38,9 @@ export class ModalAddDeviceComponent implements OnInit {
   formulario: FormGroup;
   deviceTypes: any[] = []; // Inicializamos deviceTypes como un array vacío
   private destroy$ = new Subject<void>();
+  address = import.meta.env.NG_APP_ADDRESS;
+  address_complete: string = `http://${this.address}:5131/api/`;
+
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<ModalAddDeviceComponent>,
@@ -66,7 +69,7 @@ export class ModalAddDeviceComponent implements OnInit {
       'Authorization': `Bearer ${token}` // Incluir el token en el encabezado
     });
 
-    this.http.get<any[]>('http://localhost:5131/api/device', {headers}).subscribe(
+    this.http.get<any[]>(`${this.address_complete}device`, {headers}).subscribe(
       (data) => {
         this.deviceTypes = data; // Asignamos los datos obtenidos a deviceTypes
       },
@@ -93,7 +96,7 @@ export class ModalAddDeviceComponent implements OnInit {
         DeviceName: this.formulario.value.deviceType
       };
   
-      this.http.post('http://localhost:5131/api/DeviceUserRelation', deviceUserRelation, { headers })
+      this.http.post(`${this.address_complete}DeviceUserRelation`, deviceUserRelation, { headers })
         .pipe(takeUntil(this.destroy$))
         .subscribe(
           (response) => {
