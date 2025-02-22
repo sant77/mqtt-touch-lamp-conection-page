@@ -10,6 +10,8 @@ COPY ./ /app/
 # Instalar dependencias
 RUN npm install
 
+RUN npm install esbuild --save-dev
+
 # Construir la aplicación en modo producción
 RUN npm run build --prod
 
