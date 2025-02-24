@@ -1,0 +1,44 @@
+name: Deploy Page mqqt
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: us-east-1                     # Cambia a tu región de AWS
+  EC2_INSTANCE_IP: 54.91.24.178            # Cambia a la IP pública de tu instancia EC2
+  EC2_SSH_KEY: ${{ secrets.LIGHT_SSH_KEY }}   # Clave privada SSH en formato PEM
+  EC2_USER: ubuntu                        # Usuario de la instancia (ec2-user para Amazon Linux)
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}  # Nombre de usuario de Docker Hub
+  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}  # Contraseña de Docker Hub
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ env.EC2_SSH_KEY }}" > ~/.ssh/ec2_key.pem
+        chmod 600 ~/.ssh/ec2_key.pem
+        echo "Instalada la clave SSH"
+
+    - name: Create app directory on EC2
+      run: |
+        ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ubuntu@${{ env.EC2_INSTANCE_IP }} "mkdir -p /home/ubuntu/app && chown -R ubuntu:ubuntu /home/ubuntu/app"
+
+    - name: Copy files to AWS LIGHT
+      run: |
+        rsync -avz -e "ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no" --exclude .git . ubuntu@${{ env.EC2_INSTANCE_IP }}:/home/ubuntu/app
+
+
+    - name: Deploy application
+      run: |
+        ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ubuntu@${{ env.EC2_INSTANCE_IP }} << 'EOF'
+        cd /home/ubuntu/app/docker-compose
+        sudo docker-compose up -d
+        EOF
