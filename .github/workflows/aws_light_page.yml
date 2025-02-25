@@ -6,7 +6,7 @@ on:
 
 env:
   AWS_REGION: us-east-1                     # Cambia a tu región de AWS
-  EC2_INSTANCE_IP: 34.207.236.18           # Cambia a la IP pública de tu instancia EC2
+  EC2_INSTANCE_IP: 3.228.254.175          # Cambia a la IP pública de tu instancia EC2
   EC2_SSH_KEY: ${{ secrets.LIGHT_SSH_KEY }}   # Clave privada SSH en formato PEM
   EC2_USER: ubuntu                        # Usuario de la instancia (ec2-user para Amazon Linux)
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}  # Nombre de usuario de Docker Hub
