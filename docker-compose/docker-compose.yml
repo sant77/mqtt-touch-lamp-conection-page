@@ -24,7 +24,7 @@ services:
       - "8080:8080"
 
   frontend:
-    image:  sant77/mqtt-touch-lamp-conection-page:0.0.1
+    image:  sant77/mqtt-touch-lamp-conection-page:0.0.2
     container_name: frontend
     environment:
       - NG_APP_ADDRESS=${NG_APP_ADDRESS:-backend_user}
