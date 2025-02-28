@@ -21,7 +21,7 @@ services:
     environment:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-Server=localhost;Database=user_data;User=root;Password=root_password;}
     ports:
-      - "8080:8080"
+      - "5131:8080"
 
   frontend:
     image:  sant77/mqtt-touch-lamp-conection-page:0.0.2
