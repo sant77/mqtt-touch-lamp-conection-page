@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {MatInputModule} from '@angular/material/input';
-import {MatButtonModule} from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 import { RegisterUser } from './register-service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -34,6 +34,17 @@ export class SignUpComponent {
   onSubmit(): void {
     if (this.registerForm.valid) {
       const formData = this.registerForm.value;
+
+      // Comparar las contraseñas
+      if (formData.password !== formData.password2) {
+        this.errorMessage = 'Las contraseñas no coinciden.';
+        return;
+      }
+
+      // Eliminar password2 del objeto formData
+      delete formData.password2;
+
+      // Enviar los datos al servicio
       this.myService.register(formData).subscribe({
         next: (response) => {
           console.log('Registro exitoso', response);

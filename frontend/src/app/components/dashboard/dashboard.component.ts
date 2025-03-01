@@ -60,7 +60,7 @@ export class DashboardComponent {
   device_relation_user: UserDeviceRelation[] = [];
   relation_user: UserConection[] = [];
   address = import.meta.env.NG_APP_ADDRESS;
-  address_complete: string = `http://${this.address}:5131/api/`;
+  address_complete: string = `http://${this.address}:8080/api/`;
   
   constructor(private dialog: MatDialog, private http: HttpClient) {}
   

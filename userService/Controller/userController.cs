@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace userService.Controllers
 {
@@ -17,19 +18,27 @@ namespace userService.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly string _jwtSecret = "TuClaveSecretaSuperSeguraDe32CaracteresOmas";
-        private readonly ILogger<userController> _logger; // Declarar el campo _logger
+        private readonly ILogger<userController> _logger;
 
-        public userController(ApplicationDbContext context, ILogger<userController> logger) // Inyectar ILogger
+        public userController(ApplicationDbContext context, ILogger<userController> logger)
         {
             _context = context;
-            _logger = logger; // Inicializar el campo _logger
+            _logger = logger;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] Dictionary<string, object> request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            if (user == null || !VerifyPassword(request.Password, user.Password))
+            if (!request.ContainsKey("email") || !request.ContainsKey("password"))
+            {
+                return BadRequest("El request debe contener 'Email' y 'Password'.");
+            }
+
+            var email = request["email"].ToString();
+            var password = request["password"].ToString();
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null || !VerifyPassword(password, user.Password))
             {
                 return Unauthorized("Credenciales inválidas");
             }
@@ -68,12 +77,6 @@ namespace userService.Controllers
             return hashedInput == hashedPassword;
         }
 
-        public class LoginRequest
-        {
-            public string Email { get; set; }
-            public string Password { get; set; }
-        }
-
         // GET: api/usuarios
         [HttpGet]
         public async Task<IActionResult> GetUsuarios()
@@ -88,23 +91,21 @@ namespace userService.Controllers
         {
             var excludeEmail = User.FindFirst(ClaimTypes.Email)?.Value;
 
-            _logger.LogInformation("ExcludeEmail recibido: {ExcludeEmail}", excludeEmail); // Usar _logger
+            _logger.LogInformation("ExcludeEmail recibido: {ExcludeEmail}", excludeEmail);
 
             var usersQuery = _context.Users.AsQueryable();
 
-          
             usersQuery = usersQuery.Where(u => u.Email != excludeEmail);
-            
 
             var usersWithDevices = await _context.Users
-                .Where(u => u.DeviceUserRelations.Any()) // Solo usuarios con relaciones en DeviceUserRelation
-                .Where(u => u.Email != excludeEmail) // Excluir el email del usuario autenticado
-            .Select(u => new 
-            { 
-                u.Email, 
-                u.Name 
-            })
-            .ToListAsync();
+                .Where(u => u.DeviceUserRelations.Any())
+                .Where(u => u.Email != excludeEmail)
+                .Select(u => new 
+                { 
+                    u.Email, 
+                    u.Name 
+                })
+                .ToListAsync();
 
             return Ok(usersWithDevices);
         }
@@ -113,7 +114,7 @@ namespace userService.Controllers
         public async Task<IActionResult> GetUsuario(Guid id)
         {
             var user = await _context.Users
-                .Select(u => new { u.Id, u.Name, u.Email }) // Excluir la contraseña
+                .Select(u => new { u.Id, u.Name, u.Email })
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null) return NotFound();
@@ -123,18 +124,25 @@ namespace userService.Controllers
 
         // POST: api/usuarios
         [HttpPost]
-        public async Task<IActionResult> CrearUsuario(User user)
+        public async Task<IActionResult> CrearUsuario([FromBody] Dictionary<string, object> userData)
         {
+            if (!userData.ContainsKey("email") || !userData.ContainsKey("password") || !userData.ContainsKey("name"))
+            {
+                return BadRequest("El request debe contener 'Email', 'Password' y 'Name'.");
+            }
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = userData["email"].ToString(),
+                Password = HashPassword(userData["password"].ToString()),
+                Name = userData["name"].ToString()
+            };
+
             if (_context.Users.Any(u => u.Email == user.Email))
             {
                 return BadRequest("Ya existe un usuario con ese email.");
             }
-
-            // Generar un UUID para el usuario
-            user.Id = Guid.NewGuid();
-
-            // Hashear la contraseña
-            user.Password = HashPassword(user.Password);
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -153,14 +161,19 @@ namespace userService.Controllers
 
         // PUT: api/usuarios/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarUsuario(Guid id, User user)
+        public async Task<IActionResult> ActualizarUsuario(Guid id, [FromBody] Dictionary<string, object> userData)
         {
-            if (id != user.Id) return BadRequest();
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound();
 
-            // Si se envía una nueva contraseña, la hasheamos
-            if (!string.IsNullOrWhiteSpace(user.Password))
+            if (userData.ContainsKey("name"))
             {
-                user.Password = HashPassword(user.Password);
+                user.Name = userData["name"].ToString();
+            }
+
+            if (userData.ContainsKey("password"))
+            {
+                user.Password = HashPassword(userData["password"].ToString());
             }
 
             _context.Entry(user).State = EntityState.Modified;

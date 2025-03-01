@@ -39,7 +39,7 @@ export class ModalAddDeviceComponent implements OnInit {
   deviceTypes: any[] = []; // Inicializamos deviceTypes como un array vacío
   private destroy$ = new Subject<void>();
   address = import.meta.env.NG_APP_ADDRESS;
-  address_complete: string = `http://${this.address}:5131/api/`;
+  address_complete: string = `http://${this.address}:8080/api/`;
 
   constructor(
     private fb: FormBuilder,
