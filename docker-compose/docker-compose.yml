@@ -15,6 +15,17 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  backend_mqtt:
+    image: sant77/mqtt-touch-lamp-conection-mqtt-back:0.0.1
+    container_name: backend_mqtt
+    environment:
+      - MQTT_BROKER=${MQTT_BROKER:-mqtt.flespi.io}  
+      - MQTT_PORT=${MQTT_PORT:-1883}
+      - USER_NAME=${USER_NAME}  
+    ports:
+      - "8081:8081"     
+      - "1883:1883"   
+
   backend_user:
     image: sant77/mqtt-touch-lamp-conection-user-back:0.0.2
     container_name: backend_user
