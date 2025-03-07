@@ -9,42 +9,213 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace userService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class userController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly string _jwtSecret = "TuClaveSecretaSuperSeguraDe32CaracteresOmas";
-        private readonly ILogger<userController> _logger;
+        private readonly ILogger<UserController> _logger;
 
-        public userController(ApplicationDbContext context, ILogger<userController> logger)
+        public UserController(ApplicationDbContext context, ILogger<UserController> logger)
         {
             _context = context;
             _logger = logger;
         }
 
+        // POST: api/user/login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Dictionary<string, object> request)
         {
-            if (!request.ContainsKey("email") || !request.ContainsKey("password"))
+            try
             {
-                return BadRequest("El request debe contener 'Email' y 'Password'.");
+                // Validar que el request contiene los campos necesarios
+                if (!request.ContainsKey("email") || !request.ContainsKey("password"))
+                {
+                    return BadRequest("El request debe contener 'email' y 'password'.");
+                }
+
+                var email = request["email"].ToString();
+                var password = request["password"].ToString();
+
+                // Buscar el usuario en la base de datos
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user == null || !VerifyPassword(password, user.Password))
+                {
+                    return Unauthorized("Credenciales inválidas.");
+                }
+
+                // Generar y devolver el token JWT
+                var token = GenerateJwtToken(user);
+                return Ok(new { Token = token });
             }
-
-            var email = request["email"].ToString();
-            var password = request["password"].ToString();
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null || !VerifyPassword(password, user.Password))
+            catch (Exception ex)
             {
-                return Unauthorized("Credenciales inválidas");
+                _logger.LogError(ex, "Error en el método Login.");
+                return StatusCode(500, "Ocurrió un error interno.");
             }
+        }
 
-            var token = GenerateJwtToken(user);
-            return Ok(new { Token = token });
+        // GET: api/user
+        [HttpGet]
+        public async Task<IActionResult> GetUsuarios()
+        {
+            try
+            {
+                var usuarios = await _context.Users.ToListAsync();
+                return Ok(usuarios);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener los usuarios.");
+                return StatusCode(500, "Ocurrió un error interno.");
+            }
+        }
+
+        // GET: api/user/all
+        [Authorize]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            try
+            {
+                var excludeEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                _logger.LogInformation("ExcludeEmail recibido: {ExcludeEmail}", excludeEmail);
+
+                // Obtener usuarios con dispositivos asociados, excluyendo el usuario actual
+                var usersWithDevices = await _context.Users
+                    .Where(u => u.DeviceUserRelations.Any() && u.Email != excludeEmail)
+                    .Select(u => new { u.Email, u.Name })
+                    .ToListAsync();
+
+                return Ok(usersWithDevices);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener todos los usuarios.");
+                return StatusCode(500, "Ocurrió un error interno.");
+            }
+        }
+
+        // GET: api/user/{id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUsuario(Guid id)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Select(u => new { u.Id, u.Name, u.Email })
+                    .FirstOrDefaultAsync(u => u.Id == id);
+
+                if (user == null) return NotFound();
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el usuario con ID: {Id}", id);
+                return StatusCode(500, "Ocurrió un error interno.");
+            }
+        }
+
+        // POST: api/user
+        [HttpPost]
+        public async Task<IActionResult> CrearUsuario([FromBody] Dictionary<string, object> userData)
+        {
+            try
+            {
+                // Validar que el request contiene los campos necesarios
+                if (!userData.ContainsKey("email") || !userData.ContainsKey("password") || !userData.ContainsKey("name"))
+                {
+                    return BadRequest("El request debe contener 'email', 'password' y 'name'.");
+                }
+
+                // Verificar si ya existe un usuario con el mismo email
+                var email = userData["email"].ToString();
+                if (_context.Users.Any(u => u.Email == email))
+                {
+                    return BadRequest("Ya existe un usuario con ese email.");
+                }
+
+                // Crear el nuevo usuario
+                var user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Email = email,
+                    Password = HashPassword(userData["password"].ToString()),
+                    Name = userData["name"].ToString()
+                };
+
+                // Guardar el usuario en la base de datos
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetUsuario), new { id = user.Id }, user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear un nuevo usuario.");
+                return StatusCode(500, "Ocurrió un error interno.");
+            }
+        }
+
+        // PUT: api/user/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarUsuario(Guid id, [FromBody] Dictionary<string, object> userData)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(id);
+                if (user == null) return NotFound();
+
+                // Actualizar el nombre si está presente en el request
+                if (userData.ContainsKey("name"))
+                {
+                    user.Name = userData["name"].ToString();
+                }
+
+                // Actualizar la contraseña si está presente en el request
+                if (userData.ContainsKey("password"))
+                {
+                    user.Password = HashPassword(userData["password"].ToString());
+                }
+
+                // Guardar los cambios en la base de datos
+                _context.Entry(user).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar el usuario con ID: {Id}", id);
+                return StatusCode(500, "Ocurrió un error interno.");
+            }
+        }
+
+        // DELETE: api/user/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> EliminarUsuario(Guid id)
+        {
+            try
+            {
+                var usuario = await _context.Users.FindAsync(id);
+                if (usuario == null) return NotFound();
+
+                _context.Users.Remove(usuario);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar el usuario con ID: {Id}", id);
+                return StatusCode(500, "Ocurrió un error interno.");
+            }
         }
 
         // Método para generar el token JWT
@@ -71,136 +242,20 @@ namespace userService.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        // Método para verificar la contraseña
         private bool VerifyPassword(string password, string hashedPassword)
         {
-            var hashedInput = HashPassword(password);
-            return hashedInput == hashedPassword;
+            return HashPassword(password) == hashedPassword;
         }
 
-        // GET: api/usuarios
-        [HttpGet]
-        public async Task<IActionResult> GetUsuarios()
-        {
-            var usuarios = await _context.Users.ToListAsync();
-            return Ok(usuarios);
-        }
-
-        [Authorize]
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var excludeEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-
-            _logger.LogInformation("ExcludeEmail recibido: {ExcludeEmail}", excludeEmail);
-
-            var usersQuery = _context.Users.AsQueryable();
-
-            usersQuery = usersQuery.Where(u => u.Email != excludeEmail);
-
-            var usersWithDevices = await _context.Users
-                .Where(u => u.DeviceUserRelations.Any())
-                .Where(u => u.Email != excludeEmail)
-                .Select(u => new 
-                { 
-                    u.Email, 
-                    u.Name 
-                })
-                .ToListAsync();
-
-            return Ok(usersWithDevices);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUsuario(Guid id)
-        {
-            var user = await _context.Users
-                .Select(u => new { u.Id, u.Name, u.Email })
-                .FirstOrDefaultAsync(u => u.Id == id);
-
-            if (user == null) return NotFound();
-
-            return Ok(user);
-        }
-
-        // POST: api/usuarios
-        [HttpPost]
-        public async Task<IActionResult> CrearUsuario([FromBody] Dictionary<string, object> userData)
-        {
-            if (!userData.ContainsKey("email") || !userData.ContainsKey("password") || !userData.ContainsKey("name"))
-            {
-                return BadRequest("El request debe contener 'Email', 'Password' y 'Name'.");
-            }
-
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Email = userData["email"].ToString(),
-                Password = HashPassword(userData["password"].ToString()),
-                Name = userData["name"].ToString()
-            };
-
-            if (_context.Users.Any(u => u.Email == user.Email))
-            {
-                return BadRequest("Ya existe un usuario con ese email.");
-            }
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUsuario), new { id = user.Id }, user);
-        }
-
-        // Método para hashear contraseñas
+        // Método para hashear la contraseña
         private string HashPassword(string password)
         {
             using (var sha256 = System.Security.Cryptography.SHA256.Create())
             {
-                byte[] bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return Convert.ToBase64String(bytes);
             }
-        }
-
-        // PUT: api/usuarios/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarUsuario(Guid id, [FromBody] Dictionary<string, object> userData)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
-
-            if (userData.ContainsKey("name"))
-            {
-                user.Name = userData["name"].ToString();
-            }
-
-            if (userData.ContainsKey("password"))
-            {
-                user.Password = HashPassword(userData["password"].ToString());
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Users.Any(u => u.Id == id))
-                    return NotFound();
-                throw;
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> EliminarUsuario(Guid id)
-        {
-            var usuario = await _context.Users.FindAsync(id);
-            if (usuario == null) return NotFound();
-
-            _context.Users.Remove(usuario);
-            await _context.SaveChangesAsync();
-            return NoContent();
         }
     }
 }

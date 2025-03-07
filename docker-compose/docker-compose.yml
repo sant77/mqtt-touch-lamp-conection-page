@@ -16,6 +16,7 @@ services:
       - mysql_data:/var/lib/mysql
 
   backend_mqtt:
+    build: ../mqttService
     image: sant77/mqtt-touch-lamp-conection-mqtt-back:0.0.1
     container_name: backend_mqtt
     environment:
@@ -27,6 +28,7 @@ services:
       - "1883:1883"   
 
   backend_user:
+    build: ../userService
     image: sant77/mqtt-touch-lamp-conection-user-back:0.0.2
     container_name: backend_user
     environment:
@@ -35,6 +37,7 @@ services:
       - "8080:8080"
 
   frontend:
+    build: ../frontend
     image:  sant77/mqtt-touch-lamp-conection-page:0.0.3
     container_name: frontend
     environment:
