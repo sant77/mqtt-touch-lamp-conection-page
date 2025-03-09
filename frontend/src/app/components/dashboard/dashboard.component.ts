@@ -74,7 +74,8 @@ export class DashboardComponent {
   constructor(private dialog: MatDialog, 
               private dashboardService: DashboardService, 
               private router: Router, 
-              private mqttService:MqttService) {}
+              private mqttService:MqttService,
+              ) {}
 
   ngOnInit(): void {
     this.loadData();

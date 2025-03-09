@@ -62,7 +62,7 @@ async def send_mqtt_message(
 
     # Publicar el mensaje MQTT
     publish.single(
-        topic=f"{user_name}/{mqtt_topic}",
+        topic=f"{mqtt_topic}/{user_name}",
         payload=mqtt_message,
         hostname=MQTT_BROKER,
         port=MQTT_PORT,

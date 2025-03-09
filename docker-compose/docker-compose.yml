@@ -29,7 +29,7 @@ services:
 
   backend_user:
     build: ../userService
-    image: sant77/mqtt-touch-lamp-conection-user-back:0.0.2
+    image: sant77/mqtt-touch-lamp-conection-user-back:0.0.3
     container_name: backend_user
     environment:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-Server=localhost;Database=user_data;User=root;Password=root_password;}
@@ -38,7 +38,7 @@ services:
 
   frontend:
     build: ../frontend
-    image:  sant77/mqtt-touch-lamp-conection-page:0.0.3
+    image:  sant77/mqtt-touch-lamp-conection-page:0.0.4
     container_name: frontend
     environment:
       - NG_APP_ADDRESS=${NG_APP_ADDRESS:-backend_user}

@@ -247,7 +247,7 @@ namespace userService.Controllers
                     Id = relation.Id,
                     Nombre = "sunshine",
                     Dispositivo = relation.Device?.Name ?? "Desconocido",
-                    Description = $"Relación entre el usuario {relation.UserId} y el dispositivo {relation.DeviceId}"
+                    Description = $"dispositivo: {relation.UserId}/{relation.DeviceId}"
                 }).ToList();
 
                 return Ok(response);

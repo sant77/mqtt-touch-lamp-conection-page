@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-sign-up',
@@ -21,7 +22,8 @@ export class SignUpComponent {
   constructor(
     private fb: FormBuilder,
     private myService: RegisterUser,
-    private router: Router // Inyectar el Router
+    private router: Router, // Inyectar el Router
+    private toastr: ToastrService
   ) {
     this.registerForm = this.fb.group({
       name: ['', Validators.required],
@@ -48,11 +50,12 @@ export class SignUpComponent {
       this.myService.register(formData).subscribe({
         next: (response) => {
           console.log('Registro exitoso', response);
+          this.toastr.success("Usuario creado", "¡Exito!")
           this.router.navigate(['/dashboard']); // Redirigir al dashboard
         },
         error: (err) => {
+          this.toastr.error("Usuario ya existe", "¡Error!")
           console.error('Error en el registro', err);
-          this.errorMessage = 'Error al registrarse. Por favor, intenta nuevamente.'; // Mostrar mensaje de error
         }
       });
     } else {
