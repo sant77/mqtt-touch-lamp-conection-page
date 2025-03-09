@@ -34,5 +34,8 @@ docker push sant77/mqtt-touch-lamp-conection-user-back:0.0.2
 docker push sant77/mqtt-touch-lamp-conection-page:0.0.3
 ```
 ```bash
+docker compose build
+```
+```bash
 docker compose up -d
 ```

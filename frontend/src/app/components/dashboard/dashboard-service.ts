@@ -7,7 +7,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DashboardService {
-  private address_complete = `http://${import.meta.env.NG_APP_ADDRESS}:8080/api/`;
+  address = import.meta.env.NG_APP_ADDRESS;
+  port_user = import.meta.env.NG_APP_PORT_USER;
+  
+  private address_complete = `http://${this.address}:${this.port_user}/api/`;
 
   constructor(private http: HttpClient) {}
 

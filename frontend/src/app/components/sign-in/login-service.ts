@@ -7,8 +7,9 @@ import { Observable } from 'rxjs';
 })
 export class LoginUser {
   address = import.meta.env.NG_APP_ADDRESS;
+  port_user = import.meta.env.NG_APP_PORT_USER
 
-  private apiUrl: string = `http://${this.address}:8080/api/user/login`;
+  private apiUrl: string = `http://${this.address}:${this.port_user}/api/user/login`;
     
   constructor(private http: HttpClient) {}
 

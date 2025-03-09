@@ -58,8 +58,8 @@
                       </div>
                       <div class="element-table-1">
                         {{element.description}}
-                        <button mat-flat-button color="primary">Encender</button>
-                        <button mat-flat-button style="background-color: #f44336; color: #fffffe;">Apagar</button>
+                        <button mat-flat-button color="primary" (click)="sendMqttMessageOn(element)">Encender</button>
+                        <button mat-flat-button style="background-color: #f44336; color: #fffffe;" (click)="sendMqttMessageOff(element)">Apagar</button>
                       </div>
                     </div>
                   </td>

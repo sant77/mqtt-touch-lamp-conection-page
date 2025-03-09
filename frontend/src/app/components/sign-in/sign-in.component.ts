@@ -23,7 +23,7 @@ export class SignInComponent {
       private router: Router // Inyectar el Router
     ) {
       this.registerForm = this.fb.group({
-        Email: ['', [Validators.required, Validators.email]],
+        email: ['', [Validators.required, Validators.email]],
         password: ['', Validators.required]
       });
     }

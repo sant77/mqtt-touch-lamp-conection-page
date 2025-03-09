@@ -14,6 +14,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlugCircleCheck, faPlugCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { DashboardService } from './dashboard-service';
+import { MqttService } from './mqtt-service';
 
 export interface UserConection {
   Conexion: string;
@@ -34,7 +35,13 @@ export interface UserDeviceRelation {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatSidenavModule, MatToolbarModule, MatButtonModule, MatTableModule, MatIconModule, CommonModule, FontAwesomeModule],
+  imports: [MatSidenavModule, 
+            MatToolbarModule, 
+            MatButtonModule, 
+            MatTableModule, 
+            MatIconModule, 
+            CommonModule, 
+            FontAwesomeModule],
   animations: [
     trigger('detailExpand', [
       state('collapsed,void', style({ height: '0px', minHeight: '0' })),
@@ -64,7 +71,10 @@ export class DashboardComponent {
   @ViewChild(MatTable)
   table!: MatTable<UserConection | UserDeviceRelation>;
 
-  constructor(private dialog: MatDialog, private dashboardService: DashboardService, private router: Router) {}
+  constructor(private dialog: MatDialog, 
+              private dashboardService: DashboardService, 
+              private router: Router, 
+              private mqttService:MqttService) {}
 
   ngOnInit(): void {
     this.loadData();
@@ -169,4 +179,30 @@ export class DashboardComponent {
     localStorage.clear();
     this.router.navigate(['/']);
   }
+
+  sendMqttMessageOn(row:UserDeviceRelation): void{
+    const index = this.dataSourceDevice.indexOf(row);
+    console.log(this.dataSourceDevice[index]);
+    this.mqttService.sendMqttMessage(this.dataSourceDevice[index]["id"], "On").subscribe(
+      () => {
+        console.log("Mensaje enviado.")
+      },
+      (error) => {
+        console.error("Error al enviar mensaje.", error);
+      }
+    );
+  }
+
+  sendMqttMessageOff(row:UserDeviceRelation): void{
+    const index = this.dataSourceDevice.indexOf(row);
+    console.log(this.dataSourceDevice[index]);
+    this.mqttService.sendMqttMessage(this.dataSourceDevice[index]["id"], "Off").subscribe(
+      () => {
+        console.log("Mensaje enviado.")
+      },
+      (error) => {
+        console.error("Error al enviar mensaje.", error);
+      }
+    );
+}
 }

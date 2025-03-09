@@ -70,6 +70,7 @@ namespace userService.Controllers
         }
 
         // POST: api/RelationUser
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateRelationUser([FromBody] Dictionary<string, object> request)
         {
@@ -146,6 +147,7 @@ namespace userService.Controllers
         }
 
         // DELETE: api/RelationUser/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRelationUser(Guid id)
         {

@@ -61,13 +61,16 @@ namespace userService.Controllers
         }
 
         // GET: api/user
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetUsuarios()
         {
             try
             {
-                var usuarios = await _context.Users.ToListAsync();
-                return Ok(usuarios);
+                var users = await _context.Users
+                .Select(u => new { u.Email, u.Name })
+                .ToListAsync();
+                return Ok(users);
             }
             catch (Exception ex)
             {
@@ -102,6 +105,7 @@ namespace userService.Controllers
         }
 
         // GET: api/user/{id}
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUsuario(Guid id)
         {
@@ -198,6 +202,7 @@ namespace userService.Controllers
         }
 
         // DELETE: api/user/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarUsuario(Guid id)
         {
