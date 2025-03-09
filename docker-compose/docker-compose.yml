@@ -16,6 +16,7 @@ services:
       - mysql_data:/var/lib/mysql
 
   backend_mqtt:
+    build: ../mqttService
     image: sant77/mqtt-touch-lamp-conection-mqtt-back:0.0.1
     container_name: backend_mqtt
     environment:
@@ -27,7 +28,8 @@ services:
       - "1883:1883"   
 
   backend_user:
-    image: sant77/mqtt-touch-lamp-conection-user-back:0.0.2
+    build: ../userService
+    image: sant77/mqtt-touch-lamp-conection-user-back:0.0.3
     container_name: backend_user
     environment:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-Server=localhost;Database=user_data;User=root;Password=root_password;}
@@ -35,7 +37,8 @@ services:
       - "8080:8080"
 
   frontend:
-    image:  sant77/mqtt-touch-lamp-conection-page:0.0.3
+    build: ../frontend
+    image:  sant77/mqtt-touch-lamp-conection-page:0.0.4
     container_name: frontend
     environment:
       - NG_APP_ADDRESS=${NG_APP_ADDRESS:-backend_user}

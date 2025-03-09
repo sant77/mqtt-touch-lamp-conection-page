@@ -27,8 +27,6 @@ namespace userService.Controllers
         {
             var devices = await _context.Devices.ToListAsync();
             return Ok(devices);
-        }
-
-      
+        }      
     }
 }

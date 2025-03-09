@@ -2,6 +2,7 @@
     <span>Dashboard</span>
     <span class="example-spacer"></span>
     <button mat-flat-button color="primary" (click)="drawer.toggle()">Open</button>
+    <button mat-flat-button color="secundary" (click)="quick_session()">Salir</button>
   </mat-toolbar>
 
 <mat-drawer-container class="example-container" autosize >
@@ -57,8 +58,8 @@
                       </div>
                       <div class="element-table-1">
                         {{element.description}}
-                        <button mat-flat-button color="primary">Encender</button>
-                        <button mat-flat-button style="background-color: #f44336; color: #fffffe;">Apagar</button>
+                        <button mat-flat-button color="primary" (click)="sendMqttMessageOn(element)">Encender</button>
+                        <button mat-flat-button style="background-color: #f44336; color: #fffffe;" (click)="sendMqttMessageOff(element)">Apagar</button>
                       </div>
                     </div>
                   </td>

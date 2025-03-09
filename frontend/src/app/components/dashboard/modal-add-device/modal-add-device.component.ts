@@ -39,7 +39,8 @@ export class ModalAddDeviceComponent implements OnInit {
   deviceTypes: any[] = []; // Inicializamos deviceTypes como un array vacío
   private destroy$ = new Subject<void>();
   address = import.meta.env.NG_APP_ADDRESS;
-  address_complete: string = `http://${this.address}:8080/api/`;
+  port_user = import.meta.env.NG_APP_PORT_USER;
+  address_complete: string = `http://${this.address}:${this.port_user}/api/`;
 
   constructor(
     private fb: FormBuilder,
@@ -93,7 +94,7 @@ export class ModalAddDeviceComponent implements OnInit {
       });
   
       const deviceUserRelation = {
-        DeviceName: this.formulario.value.deviceType
+        deviceName: this.formulario.value.deviceType
       };
   
       this.http.post(`${this.address_complete}DeviceUserRelation`, deviceUserRelation, { headers })

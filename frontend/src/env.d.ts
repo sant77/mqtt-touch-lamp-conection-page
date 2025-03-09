@@ -2,6 +2,8 @@
 declare interface Env {
   readonly NODE_ENV: string;
   NG_APP_ADDRESS: string;
+  NG_APP_PORT_USER: string;
+  NG_APP_PORT_MQTT: string;
   // Replace the following with your own environment variables.
   // Example: NGX_VERSION: string;
   [key: string]: any;

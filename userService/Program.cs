@@ -11,7 +11,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.WithOrigins("http://localhost:4200") // Dominio de tu app Angular
+        policy.WithOrigins("http://localhost") // Dominio de tu app Angular
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -19,7 +19,6 @@ builder.Services.AddCors(options =>
 
 // Obtener la cadena de conexión desde la variable de entorno
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-
 
 // Configurar Entity Framework y MySQL
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

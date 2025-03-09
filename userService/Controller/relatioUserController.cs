@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using userService.Data;
-using userService.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-
+using System.Threading.Tasks;
+using userService.Data;
+using userService.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace userService.Controllers
 {
@@ -25,64 +24,110 @@ namespace userService.Controllers
 
         // GET: api/RelationUser
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RelationUser>>> GetRelationUsers()
+        public async Task<IActionResult> GetRelationUsers()
         {
-            return await _context.RelationUsers
-                .Include(r => r.User1)
-                .Include(r => r.User2)
-                .Include(r => r.DeviceUserRelation1)
-                .Include(r => r.DeviceUserRelation2)
-                .ToListAsync();
+            try
+            {
+                var relationUsers = await _context.RelationUsers
+                    .Include(r => r.User1)
+                    .Include(r => r.User2)
+                    .Include(r => r.DeviceUserRelation1)
+                    .Include(r => r.DeviceUserRelation2)
+                    .ToListAsync();
+
+                return Ok(relationUsers);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error interno: {ex.Message}");
+            }
         }
 
         // GET: api/RelationUser/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<RelationUser>> GetRelationUser(Guid id)
+        public async Task<IActionResult> GetRelationUser(Guid id)
         {
-            var relationUser = await _context.RelationUsers
-                .Include(r => r.User1)
-                .Include(r => r.User2)
-                .Include(r => r.DeviceUserRelation1)
-                .Include(r => r.DeviceUserRelation2)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (relationUser == null)
+            try
             {
-                return NotFound();
-            }
+                var relationUser = await _context.RelationUsers
+                    .Include(r => r.User1)
+                    .Include(r => r.User2)
+                    .Include(r => r.DeviceUserRelation1)
+                    .Include(r => r.DeviceUserRelation2)
+                    .FirstOrDefaultAsync(r => r.Id == id);
 
-            return relationUser;
+                if (relationUser == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(relationUser);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error interno: {ex.Message}");
+            }
         }
 
         // POST: api/RelationUser
+        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<RelationUser>> CreateRelationUser(RelationUser relationUser)
+        public async Task<IActionResult> CreateRelationUser([FromBody] Dictionary<string, object> request)
         {
-            if (relationUser.UserId1 == relationUser.UserId2)
+            try
             {
-                return BadRequest("User1 and User2 cannot be the same.");
-            }
-            relationUser.Id = Guid.NewGuid();
-            _context.RelationUsers.Add(relationUser);
-            await _context.SaveChangesAsync();
+                // Validar que el request contiene los campos necesarios
+                if (!request.ContainsKey("userId1") || !request.ContainsKey("userId2"))
+                {
+                    return BadRequest("El request debe contener 'userId1' y 'userId2'.");
+                }
 
-            return CreatedAtAction("GetRelationUser", new { id = relationUser.Id }, relationUser);
+                // Obtener los IDs de los usuarios
+                var userId1 = Guid.Parse(request["userId1"].ToString());
+                var userId2 = Guid.Parse(request["userId2"].ToString());
+
+                // Verificar que los usuarios no sean el mismo
+                if (userId1 == userId2)
+                {
+                    return BadRequest("User1 y User2 no pueden ser el mismo.");
+                }
+
+                // Crear la relación
+                var relationUser = new RelationUser
+                {
+                    Id = Guid.NewGuid(),
+                    UserId1 = userId1,
+                    UserId2 = userId2,
+                    DeviceUserRelationId1 = request.ContainsKey("deviceUserRelationId1") ? Guid.Parse(request["deviceUserRelationId1"].ToString()) : (Guid?)null,
+                    DeviceUserRelationId2 = request.ContainsKey("deviceUserRelationId2") ? Guid.Parse(request["deviceUserRelationId2"].ToString()) : (Guid?)null
+                };
+
+                _context.RelationUsers.Add(relationUser);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetRelationUser), new { id = relationUser.Id }, relationUser);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error interno: {ex.Message}");
+            }
         }
 
         // PUT: api/RelationUser/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRelationUser(Guid id, RelationUser relationUser)
+        public async Task<IActionResult> UpdateRelationUser(Guid id, [FromBody] RelationUser relationUser)
         {
-            if (id != relationUser.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(relationUser).State = EntityState.Modified;
-
             try
             {
+                if (id != relationUser.Id)
+                {
+                    return BadRequest();
+                }
+
+                _context.Entry(relationUser).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
+
+                return NoContent();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -95,138 +140,171 @@ namespace userService.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error interno: {ex.Message}");
+            }
         }
 
         // DELETE: api/RelationUser/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRelationUser(Guid id)
         {
-            var relationUser = await _context.RelationUsers.FindAsync(id);
-            if (relationUser == null)
+            try
             {
-                return NotFound();
+                var relationUser = await _context.RelationUsers.FindAsync(id);
+                if (relationUser == null)
+                {
+                    return NotFound();
+                }
+
+                _context.RelationUsers.Remove(relationUser);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            _context.RelationUsers.Remove(relationUser);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error interno: {ex.Message}");
+            }
         }
 
+        // POST: api/RelationUser/create-relation
+        [Authorize]
+        [HttpPost("create-relation")]
+        public async Task<IActionResult> CreateUserRelation([FromBody] Dictionary<string, object> request)
+        {
+            try
+            {
+                // Validar que el request contiene los campos necesarios
+                if (!request.ContainsKey("user") || !request.ContainsKey("deviceOwnerId") || !request.ContainsKey("deviceId"))
+                {
+                    return BadRequest("El request debe contener 'user', 'deviceOwnerId' y 'deviceId'.");
+                }
+
+                // Obtener el ID del usuario autenticado desde el token
+                var loggedInUserId = GetUserIdFromToken();
+                if (loggedInUserId == Guid.Empty)
+                {
+                    return Unauthorized("Token inválido: no se encontró el usuario.");
+                }
+
+                // Buscar al usuario que se desea vincular (usando el correo electrónico)
+                var userToLink = await _context.Users.FirstOrDefaultAsync(u => u.Email == request["user"].ToString());
+                if (userToLink == null)
+                {
+                    return NotFound($"No se encontró un usuario con el correo electrónico '{request["user"]}'.");
+                }
+
+                // Verificar que el usuario autenticado no esté intentando vincularse a sí mismo
+                if (loggedInUserId == userToLink.Id)
+                {
+                    return BadRequest("No puedes vincularte a ti mismo.");
+                }
+
+                // Crear la relación entre usuarios
+                var relationUser = new RelationUser
+                {
+                    Id = Guid.NewGuid(),
+                    UserId1 = loggedInUserId, // Usuario autenticado
+                    UserId2 = userToLink.Id, // Usuario a vincular
+                    DeviceUserRelationId1 = Guid.Parse(request["deviceOwnerId"].ToString()), // Dispositivo del usuario autenticado
+                    DeviceUserRelationId2 = Guid.Parse(request["deviceId"].ToString()) // Dispositivo del usuario a vincular
+                };
+
+                // Guardar la relación en la base de datos
+                _context.RelationUsers.Add(relationUser);
+                await _context.SaveChangesAsync();
+
+                // Devolver la relación creada
+                return CreatedAtAction(nameof(GetRelationUser), new { id = relationUser.Id }, relationUser);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error interno: {ex.Message}");
+            }
+        }
+
+        // GET: api/RelationUser/by-user
+        [Authorize]
+        [HttpGet("by-user")]
+        public async Task<IActionResult> GetUsersRelationsByUserId()
+        {
+            try
+            {
+                // Obtener el ID del usuario autenticado desde el token
+                var loggedInUserId = GetUserIdFromToken();
+                if (loggedInUserId == Guid.Empty)
+                {
+                    return Unauthorized("Token inválido: no se encontró el usuario.");
+                }
+
+                // Buscar las relaciones donde el usuario autenticado esté involucrado
+                var relations = await _context.RelationUsers
+                    .Include(r => r.User1)
+                    .Include(r => r.User2)
+                    .Include(r => r.DeviceUserRelation1)
+                    .Include(r => r.DeviceUserRelation2)
+                    .Where(r => r.UserId1 == loggedInUserId || r.UserId2 == loggedInUserId)
+                    .ToListAsync();
+
+                if (relations == null || !relations.Any())
+                {
+                    return NotFound($"No se encontraron relaciones para el usuario con ID '{loggedInUserId}'.");
+                }
+
+                // Mapear las relaciones al DTO personalizado
+                var response = relations.Select(relation => new DeviceUserRelationResponse
+                {
+                    Id = relation.Id,
+                    Conexion = relation.UserId1 == loggedInUserId ? relation.User2.Name : relation.User1.Name,
+                    Dispositivo = relation.DeviceUserRelation1?.Device?.Name ?? "sunshine",
+                    DispositivoRelacionado = relation.DeviceUserRelation2?.Device?.Name ?? "Desconocido",
+                    Description = $"Relación entre {relation.User1.Name} y {relation.User2.Name}",
+                    Publish = $"{relation.Id}/{relation.User2.Name}",
+                    Subcribe = $"{relation.Id}/{relation.User1.Name}",
+                    Status = true,
+                    Tipo = "Lampara test"
+                }).ToList();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error interno: {ex.Message}");
+            }
+        }
+
+        // Método para obtener el ID del usuario desde el token
+        private Guid GetUserIdFromToken()
+        {
+            var nameIdentifier = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(nameIdentifier) || !Guid.TryParse(nameIdentifier, out Guid userId))
+            {
+                return Guid.Empty;
+            }
+            return userId;
+        }
+
+        // Método para verificar si existe una relación
         private bool RelationUserExists(Guid id)
         {
             return _context.RelationUsers.Any(r => r.Id == id);
         }
 
-    [Authorize] // Asegura que el usuario esté autenticado
-    [HttpPost("create-relation")]
-    public async Task<ActionResult<RelationUser>> CreateUserRelation([FromBody] UserRelationRequest request)
-    {
-        // 1. Obtener el ID del usuario autenticado desde el JWT
-        var nameIdentifier = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(nameIdentifier) || !Guid.TryParse(nameIdentifier, out Guid loggedInUserId))
-        {
-            return Unauthorized("Usuario no autenticado o token inválido.");
-        }
-
-        // 2. Buscar al usuario que se desea vincular (usando el correo electrónico)
-        var userToLink = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.user);
-        if (userToLink == null)
-        {
-            return NotFound($"No se encontró un usuario con el correo electrónico '{request.user}'.");
-        }
-
-        // 3. Verificar que el usuario autenticado no esté intentando vincularse a sí mismo
-        if (loggedInUserId == userToLink.Id)
-        {
-            return BadRequest("No puedes vincularte a ti mismo.");
-        }
-
-
-        // 5. Crear la relación entre usuarios
-        var relationUser = new RelationUser
-        {
-            Id = Guid.NewGuid(),
-            UserId1 = loggedInUserId, // Usuario autenticado
-            UserId2 = userToLink.Id, // Usuario a vincular
-            DeviceUserRelationId1 = Guid.Parse(request.deviceOwnerId), // Dispositivo del usuario autenticado
-            DeviceUserRelationId2 = Guid.Parse(request.deviceId) // Dispositivo del usuario a vincular
-        };
-
-        // 6. Guardar la relación en la base de datos
-        _context.RelationUsers.Add(relationUser);
-        await _context.SaveChangesAsync();
-
-        // 7. Devolver la relación creada
-        return CreatedAtAction(nameof(GetRelationUser), new { id = relationUser.Id }, relationUser);
-    }
-
-   
-    public class UserRelationRequest
-    {
-        public string device { get; set; }
-        public string deviceId { get; set; }
-        public string deviceOwner { get; set; }
-        public string deviceOwnerId { get; set; }
-        public string user { get; set; }
-    }
-    [Authorize]
-    [HttpGet("by-user")]
-    public async Task<ActionResult<IEnumerable<DeviceUserRelationResponse>>> GetUsersRelationsByUserId()
-    {
-        // 1. Obtener el ID del usuario autenticado desde el token
-        var nameIdentifier = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(nameIdentifier) || !Guid.TryParse(nameIdentifier, out Guid loggedInUserId))
-        {
-            return Unauthorized("Token inválido: no se encontró el usuario.");
-        }
-
-        // 2. Buscar las relaciones donde el usuario autenticado esté involucrado
-        var relations = await _context.RelationUsers
-            .Include(r => r.User1) // Incluir el usuario 1
-            .Include(r => r.User2) // Incluir el usuario 2
-            .Include(r => r.DeviceUserRelation1) // Incluir el dispositivo 1
-            .Include(r => r.DeviceUserRelation2) // Incluir el dispositivo 2
-            .Where(r => r.UserId1 == loggedInUserId || r.UserId2 == loggedInUserId) // Filtrar por el usuario autenticado
-            .ToListAsync();
-
-        if (relations == null || !relations.Any())
-        {
-            return NotFound($"No se encontraron relaciones para el usuario con ID '{loggedInUserId}'.");
-        }
-
-        // 3. Mapear las relaciones al DTO personalizado
-        var response = relations.Select(relation => new DeviceUserRelationResponse
-        {
-            Id = relation.Id,
-            Conexion = relation.UserId1 == loggedInUserId ? relation.User2.Name : relation.User1.Name, // Nombre del usuario relacionado
-            Dispositivo = relation.DeviceUserRelation1?.Device?.Name ?? "sunshine", // Nombre del dispositivo 1
-            DispositivoRelacionado = relation.DeviceUserRelation2?.Device?.Name ?? "Desconocido", // Nombre del dispositivo 2
-            Description = $"Relación entre {relation.User1.Name} y {relation.User2.Name}", // Descripción personalizada
-            publish = $"{relation.Id}/{relation.User2.Name}",
-            subcribe = $"{relation.Id}/{relation.User1.Name}",
-            Status = true,
-            Tipo = "Lampara test"
-        }).ToList();
-
-        return Ok(response);
-    }
-
+        // DTO para la respuesta personalizada
         public class DeviceUserRelationResponse
-    {
-        public Guid Id { get; set; }
-        public string Conexion { get; set; }
-        public string Dispositivo { get; set; }
-        public string DispositivoRelacionado {get; set;}
-        public string Description { get; set; } // Campo adicional
-        public string publish { get; set; }
-        public string subcribe { get; set; }
-        public bool Status { get; set; }
-        public string Tipo { get; set; }
-
+        {
+            public Guid Id { get; set; }
+            public string Conexion { get; set; }
+            public string Dispositivo { get; set; }
+            public string DispositivoRelacionado { get; set; }
+            public string Description { get; set; }
+            public string Publish { get; set; }
+            public string Subcribe { get; set; }
+            public bool Status { get; set; }
+            public string Tipo { get; set; }
+        }
     }
-    }
-
 }

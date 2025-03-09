@@ -9,10 +9,35 @@ env:
   EC2_INSTANCE_IP: 3.228.254.175          # Cambia a la IP pública de tu instancia EC2
   EC2_SSH_KEY: ${{ secrets.LIGHT_SSH_KEY }}   # Clave privada SSH en formato PEM
   EC2_USER: ubuntu                        # Usuario de la instancia (ec2-user para Amazon Linux)
-  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}  # Nombre de usuario de Docker Hub
-  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}  # Contraseña de Docker Hub
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # Nombre de usuario de Docker Hub
+  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # Contraseña de Docker Hub
 
 jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub
+      run: |
+        echo "${{ env.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ env.DOCKER_HUB_USERNAME }}" --password-stdin
+
+    - name: Build Docker images with custom environment variable
+      run: |
+        echo "NG_APP_ADDRESS=${{ env.EC2_INSTANCE_IP }}" > frontend/.env
+        echo "NG_APP_PORT_USER=8080" >> frontend/.env
+        echo "NG_APP_PORT_MQTT=8081" >> frontend/.env
+        
+    - name: Build Docker images
+      run: |
+        docker-compose -f docker-compose.yml build
+
+    - name: Push Docker images to Docker Hub
+      run: |
+        docker-compose -f docker-compose.yml push
+        
   deploy:
     runs-on: ubuntu-latest
 

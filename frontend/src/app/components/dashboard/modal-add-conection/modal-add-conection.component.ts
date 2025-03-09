@@ -49,7 +49,8 @@ export class ModalAddConectionComponent {
   devicesOwnUser: any[] = [];
 
   address = import.meta.env.NG_APP_ADDRESS;
-  address_complete: string = `http://${this.address}:8080/api/`
+  port_user = import.meta.env.NG_APP_PORT_USER;
+  address_complete: string = `http://${this.address}:${this.port_user}/api/`;
 
   constructor(
     private http: HttpClient,
