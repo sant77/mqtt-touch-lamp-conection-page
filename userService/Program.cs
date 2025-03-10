@@ -49,7 +49,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Usar CORS
-app.UseCors("AllowSpecificOrigin");
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
 {
