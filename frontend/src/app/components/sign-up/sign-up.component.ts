@@ -4,14 +4,24 @@ import { MatButtonModule } from '@angular/material/button';
 import { RegisterUser } from './register-service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { NavbarComponent } from '../home/navbar/navbar.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-sign-up',
   standalone: true,
-  imports: [CommonModule, MatInputModule, MatButtonModule, ReactiveFormsModule],
+  imports: [CommonModule, 
+            MatInputModule, 
+            MatButtonModule, 
+            ReactiveFormsModule, 
+            NavbarComponent, 
+            MatToolbarModule, 
+            MatIconModule, 
+            RouterLink],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.css'
 })
