@@ -3,9 +3,12 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LoginUser } from './login-service';
 import { ToastrService } from 'ngx-toastr';
+import { NavbarComponent } from '../home/navbar/navbar.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-sign-in',
@@ -13,7 +16,11 @@ import { ToastrService } from 'ngx-toastr';
   imports: [CommonModule, 
             MatInputModule, 
             MatButtonModule, 
-            ReactiveFormsModule
+            ReactiveFormsModule,
+            NavbarComponent,
+            MatToolbarModule, 
+            MatIconModule, 
+            RouterLink
           ],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.css'

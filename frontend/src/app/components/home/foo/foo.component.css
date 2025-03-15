@@ -1,10 +1,11 @@
 .footer {
   width: 100%; /* Asegura que ocupe todo el ancho */
-  background-color: #0f0e17;/* Misma combinación que el navbar */
+  background-color: #0f0e17; /* Misma combinación que el navbar */
   color: #fffffe;
   display: flex;
   justify-content: space-between;
- 
+  align-items: center; /* Centra verticalmente los elementos */
+  padding: 10px 20px; /* Añade un poco de padding */
   font-size: 14px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Opcional: añade una sombra */
 }
@@ -17,4 +18,37 @@
 .footer mat-icon {
   color: #fffffe;
   font-size: 24px;
+}
+
+.social-icons {
+  display: flex;
+  gap: 10px; /* Espacio entre los iconos */
+}
+
+/* Media query para pantallas pequeñas (móviles) */
+@media (max-width: 600px) {
+  .footer {
+    flex-direction: column-reverse; /* Apila los elementos verticalmente y los invierte */
+    text-align: center; /* Centra el texto */
+    padding: 20px 10px; /* Ajusta el padding */
+  }
+
+  .footer span {
+    margin-top: 10px; /* Espacio entre los iconos y el texto */
+  }
+
+  .social-icons {
+    justify-content: center; /* Centra los iconos */
+  }
+
+  .footer mat-icon {
+    font-size: 20px; /* Reduce el tamaño de los iconos */
+  }
+}
+
+/* Media query para pantallas medianas (tablets) y mayores */
+@media (min-width: 601px) {
+  .footer {
+    flex-direction: row; /* Orden original: derechos reservados primero, iconos después */
+  }
 }

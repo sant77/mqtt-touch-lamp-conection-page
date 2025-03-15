@@ -39,3 +39,5 @@ docker compose build
 ```bash
 docker compose up -d
 ```
+
+https://csscrafter.com/css-particle-effects/

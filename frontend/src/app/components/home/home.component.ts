@@ -6,7 +6,7 @@ import { FooComponent } from './foo/foo.component';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [NavbarComponent, ContentComponent, FooComponent],
+  imports: [NavbarComponent, ContentComponent, FooComponent ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
