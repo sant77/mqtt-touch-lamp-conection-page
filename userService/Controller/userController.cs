@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using userService.Data;
 using userService.Models;
+using userService.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 namespace userService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("userservice/v1/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -27,7 +28,7 @@ namespace userService.Controllers
             _logger = logger;
         }
 
-        // POST: api/user/login
+        // POST: /userservice/v1/user/login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Dictionary<string, object> request)
         {
@@ -60,10 +61,10 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/user
+        // GET: /userservice/v1/user
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetUsuarios()
+        public async Task<IActionResult> GetUsers()
         {
             try
             {
@@ -79,7 +80,7 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/user/all
+        // GET: /userservice/v1/user/all
         [Authorize]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
@@ -104,10 +105,10 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/user/{id}
+        // GET: /userservice/v1/user/{id}
         [Authorize]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUsuario(Guid id)
+        public async Task<IActionResult> GetUser(Guid id)
         {
             try
             {
@@ -126,39 +127,46 @@ namespace userService.Controllers
             }
         }
 
-        // POST: api/user
-        [HttpPost]
-        public async Task<IActionResult> CrearUsuario([FromBody] Dictionary<string, object> userData)
+        // POST: /userservice/v1/user
+        [HttpPost]                       
+        public async Task<IActionResult> CreateUser([FromBody] Dictionary<string, object> userData)
         {
             try
             {
-                // Validar que el request contiene los campos necesarios
+                // check if the json was load with email, password and name
                 if (!userData.ContainsKey("email") || !userData.ContainsKey("password") || !userData.ContainsKey("name"))
                 {
                     return BadRequest("El request debe contener 'email', 'password' y 'name'.");
                 }
 
-                // Verificar si ya existe un usuario con el mismo email
+                // check if the user already exist
                 var email = userData["email"].ToString();
                 if (_context.Users.Any(u => u.Email == email))
                 {
                     return BadRequest("Ya existe un usuario con ese email.");
                 }
 
-                // Crear el nuevo usuario
+                string token = Guid.NewGuid().ToString();
+                // Crear user object
                 var user = new User
                 {
                     Id = Guid.NewGuid(),
                     Email = email,
                     Password = HashPassword(userData["password"].ToString()),
-                    Name = userData["name"].ToString()
+                    Name = userData["name"].ToString(),
+                    EmailConfirmed = false,
+                    ConfirmationToken = token
                 };
 
-                // Guardar el usuario en la base de datos
+                // Save user in db
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetUsuario), new { id = user.Id }, user);
+                // Send email confirmation
+                var emailService = new EmailService();
+                await emailService.SendConfirmationEmail(user.Email, token);
+
+                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
             }
             catch (Exception ex)
             {
@@ -167,9 +175,10 @@ namespace userService.Controllers
             }
         }
 
-        // PUT: api/user/{id}
+        // PUT: /userservice/v1/user/{id}
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarUsuario(Guid id, [FromBody] Dictionary<string, object> userData)
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] Dictionary<string, object> userData)
         {
             try
             {
@@ -201,7 +210,7 @@ namespace userService.Controllers
             }
         }
 
-        // DELETE: api/user/{id}
+        // DELETE: /userservice/v1/user/{id}
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarUsuario(Guid id)
@@ -223,7 +232,33 @@ namespace userService.Controllers
             }
         }
 
-        // Método para generar el token JWT
+        [HttpGet("confirm")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string token)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.ConfirmationToken == token);
+
+                if (user == null)
+                {
+                    return BadRequest("Token inválido.");
+                }
+
+                user.EmailConfirmed = true;
+                user.ConfirmationToken = null;
+                await _context.SaveChangesAsync();
+
+                return Ok("Correo confirmado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al confirmar el correo.");
+                return StatusCode(500, "Ocurrió un error interno.");
+            }
+        }
+
+
+        // Method to generate token
         private string GenerateJwtToken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));

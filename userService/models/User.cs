@@ -21,7 +21,11 @@ namespace userService.Models
         public string Email { get; set; } // Email único
 
         [Required]
-        public string Password { get; set; } // Contraseña (hash)
+        public string Password { get; set; }
+
+        public bool EmailConfirmed { get; set; } // Contraseña (hash)
+
+        public string  ConfirmationToken { get; set; }
 
         // Relación con DeviceUserRelation (1 usuario puede estar relacionado con múltiples dispositivos)
         [JsonIgnore]

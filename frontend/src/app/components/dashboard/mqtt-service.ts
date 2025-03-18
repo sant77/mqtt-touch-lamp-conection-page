@@ -9,7 +9,7 @@ export class MqttService {
   address = import.meta.env.NG_APP_ADDRESS;
   port_mqtt = import.meta.env.NG_APP_PORT_MQTT
  
-  private apiUrl: string = `http://${this.address}:${this.port_mqtt}/send_mqtt_message`;
+  private apiUrl: string = `http://${this.address}:${this.port_mqtt}/mqttservice/v1/send_mqtt_message`;
 
   constructor(private http: HttpClient) {}
 

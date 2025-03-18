@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace userService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("userservice/v1/[controller]")]
     [ApiController]
     public class RelationUserController : ControllerBase
     {
@@ -22,7 +22,7 @@ namespace userService.Controllers
             _context = context;
         }
 
-        // GET: api/RelationUser
+        // GET: /userservice/v1/RelationUser
         [HttpGet]
         public async Task<IActionResult> GetRelationUsers()
         {
@@ -43,7 +43,7 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/RelationUser/{id}
+        // GET: /userservice/v1/RelationUser/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRelationUser(Guid id)
         {
@@ -69,7 +69,7 @@ namespace userService.Controllers
             }
         }
 
-        // POST: api/RelationUser
+        // POST: /userservice/v1/RelationUser
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateRelationUser([FromBody] Dictionary<string, object> request)
@@ -113,7 +113,7 @@ namespace userService.Controllers
             }
         }
 
-        // PUT: api/RelationUser/{id}
+        // PUT: /userservice/v1/RelationUser/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRelationUser(Guid id, [FromBody] RelationUser relationUser)
         {
@@ -146,7 +146,7 @@ namespace userService.Controllers
             }
         }
 
-        // DELETE: api/RelationUser/{id}
+        // DELETE: /userservice/v1/RelationUser/{id}
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRelationUser(Guid id)
@@ -170,7 +170,7 @@ namespace userService.Controllers
             }
         }
 
-        // POST: api/RelationUser/create-relation
+        // POST: /userservice/v1/RelationUser/create-relation
         [Authorize]
         [HttpPost("create-relation")]
         public async Task<IActionResult> CreateUserRelation([FromBody] Dictionary<string, object> request)
@@ -226,7 +226,7 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/RelationUser/by-user
+        // GET: /userservice/v1/RelationUser/by-user
         [Authorize]
         [HttpGet("by-user")]
         public async Task<IActionResult> GetUsersRelationsByUserId()

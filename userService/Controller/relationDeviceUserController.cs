@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace userService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("userservice/v1/[controller]")]
     [ApiController]
     public class DeviceUserRelationController : ControllerBase
     {
@@ -22,7 +22,7 @@ namespace userService.Controllers
             _context = context;
         }
 
-        // POST: api/DeviceUserRelation
+        // POST: /userservice/v1/DeviceUserRelation
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateDeviceUserRelation([FromBody] Dictionary<string, object> request)
@@ -69,7 +69,7 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/DeviceUserRelation
+        // GET: /userservice/v1/DeviceUserRelation
         [HttpGet]
         public async Task<IActionResult> GetDeviceUserRelations()
         {
@@ -88,7 +88,7 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/DeviceUserRelation/{id}
+        // GET: /userservice/v1/DeviceUserRelation/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDeviceUserRelation(Guid id)
         {
@@ -112,7 +112,7 @@ namespace userService.Controllers
             }
         }
 
-        // PUT: api/DeviceUserRelation/{id}
+        // PUT: /userservice/v1/DeviceUserRelation/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDeviceUserRelation(Guid id, [FromBody] DeviceUserRelation relation)
         {
@@ -145,7 +145,7 @@ namespace userService.Controllers
             }
         }
 
-        // DELETE: api/DeviceUserRelation/{id}
+        // DELETE: /userservice/v1/DeviceUserRelation/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDeviceUserRelation(Guid id)
         {
@@ -168,7 +168,7 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/DeviceUserRelation/by-user
+        // GET: /userservice/v1/DeviceUserRelation/by-user
         [HttpGet("by-user")]
         public async Task<IActionResult> GetDeviceUserRelationsByUserId()
         {
@@ -209,7 +209,7 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/DeviceUserRelation/by-email?email=usuario@example.com
+        // GET: /userservice/v1/DeviceUserRelation/by-email?email=usuario@example.com
         [HttpGet("by-email")]
         public async Task<IActionResult> GetDeviceUserRelationsByEmail(string email)
         {

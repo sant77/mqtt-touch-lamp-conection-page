@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace userService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("userservice/v1/[controller]")]
     public class DeviceController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -21,7 +21,7 @@ namespace userService.Controllers
             _context = context;
         }
 
-        // GET: api/usuarios
+        // GET: /userservice/v1/usuarios
         [HttpGet]
         public async Task<IActionResult> GetDevice()
         {

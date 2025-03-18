@@ -10,7 +10,7 @@ export class DashboardService {
   address = import.meta.env.NG_APP_ADDRESS;
   port_user = import.meta.env.NG_APP_PORT_USER;
   
-  private address_complete = `http://${this.address}:${this.port_user}/api/`;
+  private address_complete = `http://${this.address}:${this.port_user}/userservice/v1/`;
 
   constructor(private http: HttpClient) {}
 
