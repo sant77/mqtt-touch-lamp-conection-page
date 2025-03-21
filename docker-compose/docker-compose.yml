@@ -35,6 +35,7 @@ services:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-Server=localhost;Database=user_data;User=root;Password=root_password;}
       - EMAIL=${EMAIL}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - ADRESS_SERVER=${ADRESS_SERVER:-localhost}
     ports:
       - "8080:8080"
 

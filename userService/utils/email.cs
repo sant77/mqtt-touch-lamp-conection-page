@@ -16,7 +16,7 @@ public class EmailService
     {
         try
         {
-            var address = Environment.GetEnvironmentVariable("ADRESS");
+            var address = Environment.GetEnvironmentVariable("ADRESS_SERVER");
 
             string confirmationLink = $"http://{address}/userservice/v1/user/confirm?token={token}";
             string htmlBody = $@"

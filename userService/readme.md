@@ -9,7 +9,10 @@ dotnet run
 ```
 
 # Agregar una nueva miración
+
+```bash
 dotnet ef migrations add NombreDeLaMigracion
+```
 
 ## Importand commands to migrate models
 
@@ -37,3 +40,5 @@ Genera un script SQL de las migraciones pendientes.
 ```bash
 dotnet ef migrations script
 ```
+
+

@@ -37,7 +37,7 @@ namespace userService.Controllers
                 // Validar que el request contiene los campos necesarios
                 if (!request.ContainsKey("email") || !request.ContainsKey("password"))
                 {
-                    return BadRequest("El request debe contener 'email' y 'password'.");
+                    return BadRequest(new { error = "El request debe contener 'email' y 'password'." });
                 }
 
                 var email = request["email"].ToString();
@@ -45,9 +45,15 @@ namespace userService.Controllers
 
                 // Buscar el usuario en la base de datos
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
                 if (user == null || !VerifyPassword(password, user.Password))
                 {
-                    return Unauthorized("Credenciales inválidas.");
+                    return Unauthorized(new { error = "Credenciales inválidas." });
+                }
+
+                if (user.EmailConfirmed != 1)
+                {
+                    return Unauthorized(new { error = "No has confirmado tu correo." });
                 }
 
                 // Generar y devolver el token JWT
@@ -57,7 +63,7 @@ namespace userService.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error en el método Login.");
-                return StatusCode(500, "Ocurrió un error interno.");
+                return StatusCode(500, new { error = "Ocurrió un error interno." });
             }
         }
 
@@ -136,14 +142,14 @@ namespace userService.Controllers
                 // check if the json was load with email, password and name
                 if (!userData.ContainsKey("email") || !userData.ContainsKey("password") || !userData.ContainsKey("name"))
                 {
-                    return BadRequest("El request debe contener 'email', 'password' y 'name'.");
+                    return BadRequest(new {error = "El request debe contener 'email', 'password' y 'name'."});
                 }
 
                 // check if the user already exist
                 var email = userData["email"].ToString();
                 if (_context.Users.Any(u => u.Email == email))
                 {
-                    return BadRequest("Ya existe un usuario con ese email.");
+                    return BadRequest(new {error = "Ya existe un usuario con ese email."});
                 }
 
                 string token = Guid.NewGuid().ToString();
@@ -245,7 +251,7 @@ namespace userService.Controllers
                 }
 
                 user.EmailConfirmed = true;
-                user.ConfirmationToken = null;
+                user.ConfirmationToken = "";
                 await _context.SaveChangesAsync();
 
                 return Ok("Correo confirmado correctamente.");
