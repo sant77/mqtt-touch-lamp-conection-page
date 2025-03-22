@@ -51,7 +51,7 @@ namespace userService.Controllers
                     return Unauthorized(new { error = "Credenciales inválidas." });
                 }
 
-                if (user.EmailConfirmed != 1)
+                if (!user.EmailConfirmed)
                 {
                     return Unauthorized(new { error = "No has confirmado tu correo." });
                 }

@@ -57,9 +57,15 @@
                       <div class="example-element-diagram">
                       </div>
                       <div class="element-table-1">
-                        {{element.description}}
-                        <button mat-flat-button color="primary" (click)="sendMqttMessageOn(element)">Encender</button>
-                        <button mat-flat-button style="background-color: #f44336; color: #fffffe;" (click)="sendMqttMessageOff(element)">Apagar</button>
+                        <div>
+                          {{element.description}}
+                        </div>
+
+                        <div class="button-container-mqtt">
+                          <button mat-flat-button color="primary" (click)="sendMqttMessageOn(element)">Encender</button>
+                          <button mat-flat-button style="background-color: #f44336; color: #fffffe;" (click)="sendMqttMessageOff(element)">Apagar</button>
+                        </div>
+
                       </div>
                     </div>
                   </td>
