@@ -14,7 +14,7 @@
         <mat-form-field appearance="outline">
           <input matInput #tokenInput [value]="token" readonly>
         </mat-form-field>
-        <button mat-raised-button color="primary" (click)="copyToken(tokenInput)" matTooltip="Copiar token">
+        <button mat-raised-button color="primary" (click)="copyToken(tokenInput)" matTooltip="Copiar token" class="button-copy">
           <mat-icon>content_copy</mat-icon>
         </button>
         <button mat-raised-button color="accent" (click)="changeToken()">

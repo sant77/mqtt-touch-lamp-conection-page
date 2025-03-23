@@ -1,1 +1,63 @@
-<p>device works!</p>
+<div class="conection-table">
+    <button  mat-flat-button (click)="openModalDevice()" color="primary">Agregar dispositivo</button>
+    <table mat-table
+        [dataSource]="dataSourceDevice" multiTemplateDataRows
+        class="mat-elevation-z8">
+      @for (t1_column of columnsToDisplayDevice; track t1_column) {
+        <ng-container matColumnDef="{{t1_column}}">
+          <th mat-header-cell *matHeaderCellDef> {{t1_column}} </th>
+          <td mat-cell *matCellDef="let element"> {{element[t1_column]}} </td>
+        </ng-container>
+      }
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef> Eliminar </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button color="warn" (click)="deleteDeviceRow(element)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button aria-label="expand row" (click)="(expandedElementDevice = expandedElementDevice === element ? null : element); $event.stopPropagation()">
+            @if (expandedElementDevice === element) {
+              <mat-icon>keyboard_arrow_up</mat-icon>
+            } @else {
+              <mat-icon>keyboard_arrow_down</mat-icon>
+            }
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplayWithExpandDevice.length + 1">
+          <div class="example-element-detail"
+              [@detailExpand]="element == expandedElementDevice ? 'expanded' : 'collapsed'">
+            <div class="example-element-diagram">
+            </div>
+            <div class="element-table-1">
+              <div>
+                {{element.description}}
+              </div>
+
+              <div class="button-container-mqtt">
+                <button mat-flat-button color="primary" (click)="sendMqttMessageOn(element)">Encender</button>
+                <button mat-flat-button style="background-color: #f44336; color: #fffffe;" (click)="sendMqttMessageOff(element)">Apagar</button>
+              </div>
+
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpandDevice.concat(['delete'])"></tr>
+      <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithExpandDevice.concat(['delete']);"
+          class="example-element-row"
+          [class.example-expanded-row]="expandedElementDevice === element"
+          (click)="expandedElementDevice = expandedElementDevice === element ? null : element">
+      </tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+    </table>
+  </div>
