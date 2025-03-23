@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { UserService } from './user-service';
 
 @Component({
   selector: 'app-user-config',
@@ -21,9 +22,29 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   styleUrl: './user-config.component.css'
 })
 export class UserConfigComponent {
-  username: string = 'UsuarioEjemplo';
-  email: string = 'usuario@example.com';
-  token: string = 'abc123-def456-ghi789';
+  username: string = '';
+  email: string = '';
+  token: string = '';
+  constructor(
+    private userService:UserService
+  ){}
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  loadData(){
+    this.userService.getUserProfile().subscribe(
+      (data)=>{
+        this.username = data.name;
+        this.email = data.email;
+        this.token = data.deviceToken;
+      },
+      (error)=>{
+
+      }
+    );
+  }
 
   copyToken(tokenInput: HTMLInputElement): void {
     tokenInput.select();

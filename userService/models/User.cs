@@ -27,6 +27,16 @@ namespace userService.Models
 
         public string  ConfirmationToken { get; set; }
 
+        public string  DeviceToken { get; set; }
+
+         // Fecha de registro
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // Fecha de modificación
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
         // Relación con DeviceUserRelation (1 usuario puede estar relacionado con múltiples dispositivos)
         [JsonIgnore]
         public ICollection<DeviceUserRelation> DeviceUserRelations { get; set; }
@@ -62,7 +72,8 @@ namespace userService.Models
     public Guid UserId { get; set; }
 
     public User? User { get; set; } // Propiedad de navegación (optional)
-
+    
+    public bool SetDevice { get; set; }
     // Clave foránea hacia Device
     [Required]
     public Guid DeviceId { get; set; }

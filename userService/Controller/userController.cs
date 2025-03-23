@@ -67,25 +67,7 @@ namespace userService.Controllers
             }
         }
 
-        // GET: /userservice/v1/user
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> GetUsers()
-        {
-            try
-            {
-                var users = await _context.Users
-                .Select(u => new { u.Email, u.Name })
-                .ToListAsync();
-                return Ok(users);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener los usuarios.");
-                return StatusCode(500, "Ocurrió un error interno.");
-            }
-        }
-
+        
         // GET: /userservice/v1/user/all
         [Authorize]
         [HttpGet("all")]
@@ -111,24 +93,29 @@ namespace userService.Controllers
             }
         }
 
-        // GET: /userservice/v1/user/{id}
+        // GET: /userservice/v1/user/by_token
         [Authorize]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(Guid id)
+        [HttpGet("by_token")]
+        public async Task<IActionResult> GetUser()
         {
             try
             {
+                 var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                _logger.LogInformation("ExcludeEmail recibido: {ExcludeEmail}", email);
+                
                 var user = await _context.Users
-                    .Select(u => new { u.Id, u.Name, u.Email })
-                    .FirstOrDefaultAsync(u => u.Id == id);
+                    .Select(u => new { u.Id, u.Name, u.Email, u.DeviceToken })
+                    .FirstOrDefaultAsync(u => u.Email == email);
 
-                if (user == null) return NotFound();
+                if (user == null) {
+                    return NotFound(new { error = "Usuario no encontrado" });
+                }
 
                 return Ok(user);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener el usuario con ID: {Id}", id);
+                _logger.LogError(ex, "Error al obtener el usuario");
                 return StatusCode(500, "Ocurrió un error interno.");
             }
         }
@@ -153,6 +140,7 @@ namespace userService.Controllers
                 }
 
                 string token = Guid.NewGuid().ToString();
+                string deviceToken = Guid.NewGuid().ToString();
                 // Crear user object
                 var user = new User
                 {
@@ -161,7 +149,9 @@ namespace userService.Controllers
                     Password = HashPassword(userData["password"].ToString()),
                     Name = userData["name"].ToString(),
                     EmailConfirmed = false,
-                    ConfirmationToken = token
+                    ConfirmationToken = token,
+                    DeviceToken = deviceToken,
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 // Save user in db

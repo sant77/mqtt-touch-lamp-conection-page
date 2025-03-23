@@ -101,7 +101,7 @@ export class ModalAddDeviceComponent implements OnInit {
         .pipe(takeUntil(this.destroy$))
         .subscribe(
           (response) => {
-            console.log('Relación creada exitosamente', response);
+            
             this.dialogRef.close(response); // Cerrar el modal y devolver la respuesta
           },
           (error) => {

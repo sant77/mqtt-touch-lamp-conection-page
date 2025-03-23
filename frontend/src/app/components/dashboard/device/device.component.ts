@@ -34,6 +34,13 @@ export interface UserDeviceRelation {
           MatIconModule, 
           CommonModule, 
           FontAwesomeModule],
+  animations: [
+      trigger('detailExpand', [
+      state('collapsed,void', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+            ]),
+          ],
   templateUrl: './device.component.html',
   styleUrl: './device.component.css'
 })
@@ -115,7 +122,6 @@ export class DeviceComponent {
 
   sendMqttMessageOn(row:UserDeviceRelation): void{
     const index = this.dataSourceDevice.indexOf(row);
-    console.log(this.dataSourceDevice[index]);
     this.mqttService.sendMqttMessage(this.dataSourceDevice[index]["id"], "On").subscribe(
       () => {
         console.log("Mensaje enviado.")
@@ -128,10 +134,8 @@ export class DeviceComponent {
 
   sendMqttMessageOff(row:UserDeviceRelation): void{
     const index = this.dataSourceDevice.indexOf(row);
-    console.log(this.dataSourceDevice[index]);
     this.mqttService.sendMqttMessage(this.dataSourceDevice[index]["id"], "Off").subscribe(
       () => {
-        console.log("Mensaje enviado.")
       },
       (error) => {
         console.error("Error al enviar mensaje.", error);
