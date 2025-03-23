@@ -15,6 +15,7 @@ import { faPlugCircleCheck, faPlugCircleExclamation } from '@fortawesome/free-so
 import { Router } from '@angular/router';
 import { DashboardService } from './dashboard-service';
 import { MqttService } from './mqtt-service';
+import { UserConfigComponent } from './user-config/user-config.component';
 
 export interface UserConection {
   Conexion: string;
@@ -41,7 +42,8 @@ export interface UserDeviceRelation {
             MatTableModule, 
             MatIconModule, 
             CommonModule, 
-            FontAwesomeModule],
+            FontAwesomeModule,
+            UserConfigComponent],
   animations: [
     trigger('detailExpand', [
       state('collapsed,void', style({ height: '0px', minHeight: '0' })),

@@ -1,0 +1,26 @@
+<mat-card class="user-profile-card">
+    <mat-card-header>
+      <mat-card-title>Perfil de Usuario</mat-card-title>
+    </mat-card-header>
+  
+    <mat-card-content>
+      <div class="user-info">
+        <p><strong>Nombre de usuario:</strong> {{ username }}</p>
+        <p><strong>Correo electrónico:</strong> {{ email }}</p>
+      </div>
+  
+      <div class="token-section">
+        <p><strong>Token:</strong></p>
+        <mat-form-field appearance="outline">
+          <input matInput #tokenInput [value]="token" readonly>
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="copyToken(tokenInput)" matTooltip="Copiar token">
+          <mat-icon>content_copy</mat-icon>
+        </button>
+        <button mat-raised-button color="accent" (click)="changeToken()">
+          <mat-icon>autorenew</mat-icon>
+          Cambiar Token
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>

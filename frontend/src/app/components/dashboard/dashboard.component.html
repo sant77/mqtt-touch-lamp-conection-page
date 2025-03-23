@@ -9,6 +9,7 @@
     <mat-drawer #drawer class="example-sidenav" mode="side" style="background-color: #0f0e17; color: #fffffe;">
       <p>Seleccione una opción:</p>
       <div class="button-drawer-container"> 
+        <button  class="cta-button" (click)="selectedContent = 'config'" >Configuración</button>
         <button  class="cta-button" (click)="selectedContent = 'tabla1'" >Dispositivos</button>
         <button  class="cta-button" (click)="selectedContent = 'tabla2'" >Conexiones</button>
     </div>
@@ -152,6 +153,9 @@
                 <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
               </table>
             </div>
+          </ng-container>
+          <ng-container *ngIf="selectedContent === 'config'">
+            <app-user-config></app-user-config>
           </ng-container>
     </div>
   
