@@ -55,7 +55,8 @@ namespace userService.Controllers
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
-                    DeviceId = device.Id
+                    DeviceId = device.Id,
+                    SetDevice = false
                 };
 
                 _context.DeviceUserRelations.Add(relation);
@@ -198,6 +199,7 @@ namespace userService.Controllers
                     Id = relation.Id,
                     Nombre = "sunshine",
                     Dispositivo = relation.Device?.Name ?? "Desconocido",
+                    Configurado = relation.SetDevice,
                     Description = $"Relación entre el usuario {relation.UserId} y el dispositivo {relation.DeviceId}"
                 }).ToList();
 
@@ -247,6 +249,7 @@ namespace userService.Controllers
                     Id = relation.Id,
                     Nombre = "sunshine",
                     Dispositivo = relation.Device?.Name ?? "Desconocido",
+                    Configurado = relation.SetDevice,
                     Description = $"dispositivo: {relation.UserId}/{relation.DeviceId}"
                 }).ToList();
 
@@ -279,9 +282,10 @@ namespace userService.Controllers
         public class DeviceUserRelationResponse
         {
             public Guid Id { get; set; }
-            public string Nombre { get; set; }
-            public string Dispositivo { get; set; }
-            public string Description { get; set; }
+            public string? Nombre { get; set; }
+            public string? Dispositivo { get; set; }
+            public string? Description { get; set; }
+            public bool Configurado { get; set; }
         }
     }
 }

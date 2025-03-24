@@ -21,6 +21,7 @@ export interface UserDeviceRelation {
   nombre: string;
   description: string;
   id: string;
+  configurado : boolean;
 }
 
 @Component({
@@ -48,7 +49,7 @@ export class DeviceComponent {
   showFiller = false;
   device_relation_user: UserDeviceRelation[] = [];
   dataSourceDevice = this.device_relation_user;
-  columnsToDisplayDevice = ['dispositivo', 'nombre'];
+  columnsToDisplayDevice = ['dispositivo', 'nombre', 'configurado'];
   columnsToDisplayWithExpandDevice = [...this.columnsToDisplayDevice, 'expand'];
   expandedElementDevice!: UserDeviceRelation | null;
 
