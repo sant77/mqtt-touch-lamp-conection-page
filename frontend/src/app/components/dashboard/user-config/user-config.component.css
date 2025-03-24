@@ -1,0 +1,29 @@
+.user-profile-card {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+  }
+  
+  .user-info {
+    margin-bottom: 20px;
+  }
+  
+  .token-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .token-section mat-form-field {
+    flex: 1;
+  }
+  
+  .token-section button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .button-copy{
+    width: 50px;
+  }

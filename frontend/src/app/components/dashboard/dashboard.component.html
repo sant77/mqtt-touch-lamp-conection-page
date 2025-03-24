@@ -9,6 +9,7 @@
     <mat-drawer #drawer class="example-sidenav" mode="side" style="background-color: #0f0e17; color: #fffffe;">
       <p>Seleccione una opción:</p>
       <div class="button-drawer-container"> 
+        <button  class="cta-button" (click)="selectedContent = 'config'" >Configuración</button>
         <button  class="cta-button" (click)="selectedContent = 'tabla1'" >Dispositivos</button>
         <button  class="cta-button" (click)="selectedContent = 'tabla2'" >Conexiones</button>
     </div>
@@ -17,136 +18,17 @@
     <div class="example-sidenav-content">
         
         <ng-container *ngIf="selectedContent === 'tabla1'">
-            <div class="conection-table">
-              <button  mat-flat-button (click)="openModalDevice()" color="primary">Agregar dispositivo</button>
-              <table mat-table
-                  [dataSource]="dataSourceDevice" multiTemplateDataRows
-                  class="mat-elevation-z8">
-                @for (t1_column of columnsToDisplayDevice; track t1_column) {
-                  <ng-container matColumnDef="{{t1_column}}">
-                    <th mat-header-cell *matHeaderCellDef> {{t1_column}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element[t1_column]}} </td>
-                  </ng-container>
-                }
-                <ng-container matColumnDef="delete">
-                  <th mat-header-cell *matHeaderCellDef> Eliminar </th>
-                  <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button color="warn" (click)="deleteDeviceRow(element)">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
-                </ng-container>
-                <ng-container matColumnDef="expand">
-                  <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
-                  <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button aria-label="expand row" (click)="(expandedElementDevice = expandedElementDevice === element ? null : element); $event.stopPropagation()">
-                      @if (expandedElementDevice === element) {
-                        <mat-icon>keyboard_arrow_up</mat-icon>
-                      } @else {
-                        <mat-icon>keyboard_arrow_down</mat-icon>
-                      }
-                    </button>
-                  </td>
-                </ng-container>
-          
-                <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
-                <ng-container matColumnDef="expandedDetail">
-                  <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplayWithExpandDevice.length + 1">
-                    <div class="example-element-detail"
-                        [@detailExpand]="element == expandedElementDevice ? 'expanded' : 'collapsed'">
-                      <div class="example-element-diagram">
-                      </div>
-                      <div class="element-table-1">
-                        {{element.description}}
-                        <button mat-flat-button color="primary" (click)="sendMqttMessageOn(element)">Encender</button>
-                        <button mat-flat-button style="background-color: #f44336; color: #fffffe;" (click)="sendMqttMessageOff(element)">Apagar</button>
-                      </div>
-                    </div>
-                  </td>
-                </ng-container>
-          
-                <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpandDevice.concat(['delete'])"></tr>
-                <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithExpandDevice.concat(['delete']);"
-                    class="example-element-row"
-                    [class.example-expanded-row]="expandedElementDevice === element"
-                    (click)="expandedElementDevice = expandedElementDevice === element ? null : element">
-                </tr>
-                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
-              </table>
-            </div>
-          </ng-container>
-          <ng-container *ngIf="selectedContent === 'tabla2'">
-            <div class="conection-table">
-              <button  mat-flat-button (click)="openModalConection()" color="primary">Agregar conexión</button>
-              <table mat-table
-                  [dataSource]="dataSource" multiTemplateDataRows
-                  class="mat-elevation-z8">
-                  @for (column of columnsToDisplay; track column) {
-                    <ng-container matColumnDef="{{column}}">
-                      <th mat-header-cell *matHeaderCellDef> {{column}} </th>
-                      <td mat-cell *matCellDef="let element">
-                        @if (column === 'estatus') {
-                          <ng-container *ngIf="element.status; else statusFalse">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="20" width="22.5" viewBox="0 0 576 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="#63E6BE" d="M96 0C78.3 0 64 14.3 64 32l0 96 64 0 0-96c0-17.7-14.3-32-32-32zM288 0c-17.7 0-32 14.3-32 32l0 96 64 0 0-96c0-17.7-14.3-32-32-32zM32 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l0 32c0 77.4 55 142 128 156.8l0 67.2c0 17.7 14.3 32 32 32s32-14.3 32-32l0-67.2c12.3-2.5 24.1-6.4 35.1-11.5c-2.1-10.8-3.1-21.9-3.1-33.3c0-80.3 53.8-148 127.3-169.2c.5-2.2 .7-4.5 .7-6.8c0-17.7-14.3-32-32-32L32 160zM576 368a144 144 0 1 0 -288 0 144 144 0 1 0 288 0zm-76.7-43.3c6.2 6.2 6.2 16.4 0 22.6l-72 72c-6.2 6.2-16.4 6.2-22.6 0l-40-40c-6.2-6.2-6.2-16.4 0-22.6s16.4-6.2 22.6 0L416 385.4l60.7-60.7c6.2-6.2 16.4-6.2 22.6 0z"/></svg>
-                          </ng-container>
-                          <ng-template #statusFalse>
-                            <svg xmlns="http://www.w3.org/2000/svg" height="20" width="22.5" viewBox="0 0 576 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="#9d2045" d="M96 0C78.3 0 64 14.3 64 32l0 96 64 0 0-96c0-17.7-14.3-32-32-32zM288 0c-17.7 0-32 14.3-32 32l0 96 64 0 0-96c0-17.7-14.3-32-32-32zM32 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l0 32c0 77.4 55 142 128 156.8l0 67.2c0 17.7 14.3 32 32 32s32-14.3 32-32l0-67.2c12.3-2.5 24.1-6.4 35.1-11.5c-2.1-10.8-3.1-21.9-3.1-33.3c0-80.3 53.8-148 127.3-169.2c.5-2.2 .7-4.5 .7-6.8c0-17.7-14.3-32-32-32L32 160zM432 512a144 144 0 1 0 0-288 144 144 0 1 0 0 288zm0-96a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm0-144c8.8 0 16 7.2 16 16l0 80c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-80c0-8.8 7.2-16 16-16z"/></svg>
-                          </ng-template>
-                        } @else {
-                          {{element[column]}}
-                        }
-                      </td>
-                    </ng-container>
-                  }
-                <ng-container matColumnDef="delete">
-                  <th mat-header-cell *matHeaderCellDef> Eliminar </th>
-                  <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button color="warn" (click)="deleteConnectionRow(element)">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
-                </ng-container>
-                <ng-container matColumnDef="expand">
-                  <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
-                  <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button aria-label="expand row" (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
-                      @if (expandedElement === element) {
-                        <mat-icon>keyboard_arrow_up</mat-icon>
-                      } @else {
-                        <mat-icon>keyboard_arrow_down</mat-icon>
-                      }
-                    </button>
-                  </td>
-                </ng-container>
-          
-                <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
-                <ng-container matColumnDef="expandedDetail">
-                  <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplayWithExpand.length + 1">
-                    <div class="example-element-detail"
-                        [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-                    
-                      <div class="example-element-description">
-                        <span><h5>Esta clave eres tú</h5></span>
-                        
-                        <p>{{element.subcribe}}</p>
-                        <span><h5>Esta clave es tú conexión</h5></span>
-                        <p>{{element.publish}}</p>
-                        
-                      </div>
-                    </div>
-                  </td>
-                </ng-container>
-          
-                <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand.concat(['delete'])"></tr>
-                <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithExpand.concat(['delete']);"
-                    class="example-element-row"
-                    [class.example-expanded-row]="expandedElement === element"
-                    (click)="expandedElement = expandedElement === element ? null : element">
-                </tr>
-                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
-              </table>
-            </div>
-          </ng-container>
+            <app-device></app-device>
+        </ng-container>
+        
+        <ng-container *ngIf="selectedContent === 'tabla2'">
+            <app-user-conection></app-user-conection>
+        </ng-container>
+        
+        <ng-container *ngIf="selectedContent === 'config'">
+            <app-user-config></app-user-config>
+        </ng-container>
+        
     </div>
   
   </mat-drawer-container>

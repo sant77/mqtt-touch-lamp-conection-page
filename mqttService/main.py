@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from controller import mqtt_user
 
-app = FastAPI()
+app = FastAPI(root_path="/mqttservice/v1")
 
 app.add_middleware(
     CORSMiddleware,

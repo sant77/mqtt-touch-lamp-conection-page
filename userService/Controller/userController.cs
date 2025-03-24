@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using userService.Data;
 using userService.Models;
+using userService.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 namespace userService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("userservice/v1/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -27,7 +28,7 @@ namespace userService.Controllers
             _logger = logger;
         }
 
-        // POST: api/user/login
+        // POST: /userservice/v1/user/login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Dictionary<string, object> request)
         {
@@ -36,7 +37,7 @@ namespace userService.Controllers
                 // Validar que el request contiene los campos necesarios
                 if (!request.ContainsKey("email") || !request.ContainsKey("password"))
                 {
-                    return BadRequest("El request debe contener 'email' y 'password'.");
+                    return BadRequest(new { error = "El request debe contener 'email' y 'password'." });
                 }
 
                 var email = request["email"].ToString();
@@ -44,9 +45,15 @@ namespace userService.Controllers
 
                 // Buscar el usuario en la base de datos
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
                 if (user == null || !VerifyPassword(password, user.Password))
                 {
-                    return Unauthorized("Credenciales inválidas.");
+                    return Unauthorized(new { error = "Credenciales inválidas." });
+                }
+
+                if (!user.EmailConfirmed)
+                {
+                    return Unauthorized(new { error = "No has confirmado tu correo." });
                 }
 
                 // Generar y devolver el token JWT
@@ -56,30 +63,12 @@ namespace userService.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error en el método Login.");
-                return StatusCode(500, "Ocurrió un error interno.");
+                return StatusCode(500, new { error = "Ocurrió un error interno." });
             }
         }
 
-        // GET: api/user
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> GetUsuarios()
-        {
-            try
-            {
-                var users = await _context.Users
-                .Select(u => new { u.Email, u.Name })
-                .ToListAsync();
-                return Ok(users);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener los usuarios.");
-                return StatusCode(500, "Ocurrió un error interno.");
-            }
-        }
-
-        // GET: api/user/all
+        
+        // GET: /userservice/v1/user/all
         [Authorize]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
@@ -104,61 +93,76 @@ namespace userService.Controllers
             }
         }
 
-        // GET: api/user/{id}
+        // GET: /userservice/v1/user/by_token
         [Authorize]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUsuario(Guid id)
+        [HttpGet("by_token")]
+        public async Task<IActionResult> GetUser()
         {
             try
             {
+                 var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                _logger.LogInformation("ExcludeEmail recibido: {ExcludeEmail}", email);
+                
                 var user = await _context.Users
-                    .Select(u => new { u.Id, u.Name, u.Email })
-                    .FirstOrDefaultAsync(u => u.Id == id);
+                    .Select(u => new { u.Id, u.Name, u.Email, u.DeviceToken })
+                    .FirstOrDefaultAsync(u => u.Email == email);
 
-                if (user == null) return NotFound();
+                if (user == null) {
+                    return NotFound(new { error = "Usuario no encontrado" });
+                }
 
                 return Ok(user);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener el usuario con ID: {Id}", id);
+                _logger.LogError(ex, "Error al obtener el usuario");
                 return StatusCode(500, "Ocurrió un error interno.");
             }
         }
 
-        // POST: api/user
-        [HttpPost]
-        public async Task<IActionResult> CrearUsuario([FromBody] Dictionary<string, object> userData)
+        // POST: /userservice/v1/user
+        [HttpPost]                       
+        public async Task<IActionResult> CreateUser([FromBody] Dictionary<string, object> userData)
         {
             try
             {
-                // Validar que el request contiene los campos necesarios
+                // check if the json was load with email, password and name
                 if (!userData.ContainsKey("email") || !userData.ContainsKey("password") || !userData.ContainsKey("name"))
                 {
-                    return BadRequest("El request debe contener 'email', 'password' y 'name'.");
+                    return BadRequest(new {error = "El request debe contener 'email', 'password' y 'name'."});
                 }
 
-                // Verificar si ya existe un usuario con el mismo email
+                // check if the user already exist
                 var email = userData["email"].ToString();
                 if (_context.Users.Any(u => u.Email == email))
                 {
-                    return BadRequest("Ya existe un usuario con ese email.");
+                    return BadRequest(new {error = "Ya existe un usuario con ese email."});
                 }
 
-                // Crear el nuevo usuario
+                string token = Guid.NewGuid().ToString();
+                string deviceToken = Guid.NewGuid().ToString();
+                // Crear user object
                 var user = new User
                 {
                     Id = Guid.NewGuid(),
                     Email = email,
                     Password = HashPassword(userData["password"].ToString()),
-                    Name = userData["name"].ToString()
+                    Name = userData["name"].ToString(),
+                    EmailConfirmed = false,
+                    ConfirmationToken = token,
+                    DeviceToken = deviceToken,
+                    CreatedAt = DateTime.UtcNow
                 };
 
-                // Guardar el usuario en la base de datos
+                // Save user in db
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetUsuario), new { id = user.Id }, user);
+                // Send email confirmation
+                var emailService = new EmailService();
+                await emailService.SendConfirmationEmail(user.Email, token);
+
+                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
             }
             catch (Exception ex)
             {
@@ -167,9 +171,10 @@ namespace userService.Controllers
             }
         }
 
-        // PUT: api/user/{id}
+        // PUT: /userservice/v1/user/{id}
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarUsuario(Guid id, [FromBody] Dictionary<string, object> userData)
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] Dictionary<string, object> userData)
         {
             try
             {
@@ -201,7 +206,7 @@ namespace userService.Controllers
             }
         }
 
-        // DELETE: api/user/{id}
+        // DELETE: /userservice/v1/user/{id}
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarUsuario(Guid id)
@@ -223,7 +228,33 @@ namespace userService.Controllers
             }
         }
 
-        // Método para generar el token JWT
+        [HttpGet("confirm")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string token)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.ConfirmationToken == token);
+
+                if (user == null)
+                {
+                    return BadRequest("Token inválido.");
+                }
+
+                user.EmailConfirmed = true;
+                user.ConfirmationToken = "";
+                await _context.SaveChangesAsync();
+
+                return Ok("Correo confirmado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al confirmar el correo.");
+                return StatusCode(500, "Ocurrió un error interno.");
+            }
+        }
+
+
+        // Method to generate token
         private string GenerateJwtToken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
@@ -248,13 +279,13 @@ namespace userService.Controllers
         }
 
         // Método para verificar la contraseña
-        private bool VerifyPassword(string password, string hashedPassword)
+        private static bool VerifyPassword(string password, string hashedPassword)
         {
             return HashPassword(password) == hashedPassword;
         }
 
         // Método para hashear la contraseña
-        private string HashPassword(string password)
+        private static string HashPassword(string password)
         {
             using (var sha256 = System.Security.Cryptography.SHA256.Create())
             {

@@ -64,8 +64,16 @@ export class SignUpComponent {
           this.router.navigate(['/dashboard']); // Redirigir al dashboard
         },
         error: (err) => {
-          this.toastr.error("Usuario ya existe", "¡Error!")
-          console.error('Error en el registro', err);
+               // Manejo de errores según el código de estado HTTP
+          if (err.status === 400 || err.status === 401) {
+            const errorMessage = err.error?.error || 'El usuario ya existe.'; // Si el backend envía un JSON con un campo `error`
+            this.toastr.error(errorMessage, '¡Error!');
+          } else if (err.status === 500) {
+            this.toastr.error('Ocurrió un error interno en el servidor. Inténtalo más tarde.', '¡Error!');
+          } else {
+            
+            this.toastr.error('Error desconocido. Inténtalo más tarde.', '¡Error!');
+          }
         }
       });
     } else {

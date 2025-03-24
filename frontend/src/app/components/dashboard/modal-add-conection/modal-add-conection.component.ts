@@ -50,7 +50,7 @@ export class ModalAddConectionComponent {
 
   address = import.meta.env.NG_APP_ADDRESS;
   port_user = import.meta.env.NG_APP_PORT_USER;
-  address_complete: string = `http://${this.address}:${this.port_user}/api/`;
+  address_complete: string = `http://${this.address}:${this.port_user}/userservice/v1/`;
 
   constructor(
     private http: HttpClient,

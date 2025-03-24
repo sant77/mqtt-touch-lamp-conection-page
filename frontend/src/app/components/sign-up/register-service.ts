@@ -9,7 +9,7 @@ export class RegisterUser {
   address = import.meta.env.NG_APP_ADDRESS;
   port_user = import.meta.env.NG_APP_PORT_USER
  
-  private apiUrl: string = `http://${this.address}:${this.port_user}/api/user`;
+  private apiUrl: string = `http://${this.address}:${this.port_user}/userservice/v1/user`;
 
   constructor(private http: HttpClient) {}
 

@@ -1,43 +1,42 @@
-# Mqtt device conection
+# Mqtt device conection 💡
 
-This proyect included the integration of all mqtt devices through a web page.
-The page allow to admin the different mqtt devices.
+This project involves the integration of multiple MQTT devices through a web interface. The platform allows administrators to manage different MQTT-connected devices efficiently.
 
-The main device and first is a mqtt lamp. With this lamp you can controller with a dasboard, also included a
-function that give the possibility to conect with other lamps to have a near experience with your special.
+The primary device—and the first implemented—is an MQTT-controlled lamp. Through an interactive dashboard, users can control the lamp's functionality. Additionally, the system includes a feature to connect multiple lamps, enabling a synchronized lighting experience for special occasions.
 
 
-# Folder 
+# Folder 📂
 
-- *docker-compose*: instrution to deploy the server
-- *frontend*: Interfaz on Angular 
-- *mqttService* : Service on Python which controll the conection with mqtt server
-- *userService* : Service on .net which controll the user and devices 
+- *docker-compose*:  Deployment instructions for the server.
+- *frontend*: User interface built with Angular.
+- *mqttService* : Python service handling MQTT server connections
+- *userService* : .NET service managing users and devices.
 
-#  
-```bash
-docker build -t sant77/mqtt-touch-lamp-conection-user-back:0.0.2 .
-```
-```bash
-docker build -t sant77/mqtt-touch-lamp-conection-page:0.0.3 .
-```
-```bash
-docker build -t sant77/mqtt-touch-lamp-conection-mqtt-back:0.0.1 .
-```
-```bash
-docker login -u "user" -p "password" docker.io
-```
-```bash
-docker push sant77/mqtt-touch-lamp-conection-user-back:0.0.2
-```
-```bash
-docker push sant77/mqtt-touch-lamp-conection-page:0.0.3
-```
+#  Run proyect 🏃
+
+You can run the project locally or configure GitHub secrets to enable CI/CD pipeline deployment.
+
+## Git hub actions :octocat:
+
+The project includes a CI/CD pipeline that automates deployment to an AWS server. The workflow consists of two main stages:
+
+1- Build and Push: Creates Docker images and uploads them to Docker Hub.
+
+2- Deploy: Copies the necessary files to the server and executes docker-compose commands.
+
+
+## Docker compose 🐳
+
+To run the project locally, execute the following commands:
+
 ```bash
 docker compose build
 ```
 ```bash
 docker compose up -d
 ```
+Note: Ensure the image versions in docker-compose.yml are updated.
 
-https://csscrafter.com/css-particle-effects/
+# Sources & Credits
+- CSS Animations: [CSS Crafter](https://csscrafter.com/css-particle-effects/)
+- SVG Icons: [Font Awesome](https://fontawesome.com/)

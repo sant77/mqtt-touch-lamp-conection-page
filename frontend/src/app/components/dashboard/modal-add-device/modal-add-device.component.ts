@@ -40,7 +40,7 @@ export class ModalAddDeviceComponent implements OnInit {
   private destroy$ = new Subject<void>();
   address = import.meta.env.NG_APP_ADDRESS;
   port_user = import.meta.env.NG_APP_PORT_USER;
-  address_complete: string = `http://${this.address}:${this.port_user}/api/`;
+  address_complete: string = `http://${this.address}:${this.port_user}/userservice/v1/`;
 
   constructor(
     private fb: FormBuilder,
@@ -101,7 +101,7 @@ export class ModalAddDeviceComponent implements OnInit {
         .pipe(takeUntil(this.destroy$))
         .subscribe(
           (response) => {
-            console.log('Relación creada exitosamente', response);
+            
             this.dialogRef.close(response); // Cerrar el modal y devolver la respuesta
           },
           (error) => {

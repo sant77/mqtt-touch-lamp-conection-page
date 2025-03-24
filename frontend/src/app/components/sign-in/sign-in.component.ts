@@ -52,8 +52,16 @@ export class SignInComponent {
             this.router.navigate(['/dashboard']); // Redirigir al dashboard
           },
           error: (err) => {
-            this.toastr.error('Usuario o contraseña incorrecta', '¡Error!');
-            console.error('Error en el registro', err);
+           // Manejo de errores según el código de estado HTTP
+        if (err.status === 400 || err.status === 401) {
+          const errorMessage = err.error?.error || 'Usuario o contraseña incorrecta'; // Si el backend envía un JSON con un campo `error`
+          this.toastr.error(errorMessage, '¡Error!');
+        } else if (err.status === 500) {
+          this.toastr.error('Ocurrió un error interno en el servidor. Inténtalo más tarde.', '¡Error!');
+        } else {
+          
+          this.toastr.error('Error desconocido. Inténtalo más tarde.', '¡Error!');
+        }
           }
         });
       } else {

@@ -17,7 +17,7 @@ services:
 
   backend_mqtt:
     build: ../mqttService
-    image: sant77/mqtt-touch-lamp-conection-mqtt-back:0.0.1
+    image: sant77/mqtt-touch-lamp-conection-mqtt-back:0.0.2
     container_name: backend_mqtt
     environment:
       - MQTT_BROKER=${MQTT_BROKER:-mqtt.flespi.io}  
@@ -29,16 +29,19 @@ services:
 
   backend_user:
     build: ../userService
-    image: sant77/mqtt-touch-lamp-conection-user-back:0.0.4
+    image: sant77/mqtt-touch-lamp-conection-user-back:0.0.5
     container_name: backend_user
     environment:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-Server=localhost;Database=user_data;User=root;Password=root_password;}
+      - EMAIL=${EMAIL}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - ADRESS_SERVER=${ADRESS_SERVER:-localhost}
     ports:
       - "8080:8080"
 
   frontend:
     build: ../frontend
-    image:  sant77/mqtt-touch-lamp-conection-page:0.0.5
+    image:  sant77/mqtt-touch-lamp-conection-page:0.0.6
     container_name: frontend
     environment:
       - NG_APP_ADDRESS=${NG_APP_ADDRESS:-backend_user}
