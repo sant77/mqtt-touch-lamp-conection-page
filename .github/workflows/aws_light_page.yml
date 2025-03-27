@@ -33,8 +33,8 @@ jobs:
     - name: Build Docker images with custom environment variable
       run: |
         echo "NG_APP_ADDRESS=${{ env.EC2_INSTANCE_IP }}" > frontend/.env
-        echo "NG_APP_PORT_USER=8080" >> frontend/.env
-        echo "NG_APP_PORT_MQTT=8081" >> frontend/.env
+        echo "NG_APP_PORT_USER=80" >> frontend/.env
+        echo "NG_APP_PORT_MQTT=80" >> frontend/.env
         
     - name: Build Docker images
       run: |
