@@ -9,6 +9,8 @@ import { ToastrService } from 'ngx-toastr';
 import { NavbarComponent } from '../home/navbar/navbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { ForgotPasswordDialogComponent } from './forgot-password-dialog/forgot-password-dialog.component';
 
 @Component({
   selector: 'app-sign-in',
@@ -30,6 +32,7 @@ export class SignInComponent {
     errorMessage: string | null = null; // Para manejar mensajes de error
   
     constructor(
+      private dialog: MatDialog,
       private fb: FormBuilder,
       private myService: LoginUser,
       private router: Router, // Inyectar el Router
@@ -68,5 +71,11 @@ export class SignInComponent {
        
         this.errorMessage = 'Por favor completa todos los campos correctamente.'; // Validación en el cliente
       }
+    }
+  
+    openForgotPasswordDialog(): void {
+      this.dialog.open(ForgotPasswordDialogComponent, {
+        width: '400px'
+      });
     }
 }

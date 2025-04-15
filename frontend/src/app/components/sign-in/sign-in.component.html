@@ -3,6 +3,7 @@
 </mat-toolbar>
 
 <div class="container">
+  <div class="form-wrapper">
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <h1>Iniciar sesión</h1>
       <mat-form-field appearance="fill">
@@ -14,8 +15,10 @@
         <input matInput formControlName="password" type="password" placeholder="Ingresa tu contraseña">
       </mat-form-field>
       <button class="cta-button" color="primary" type="submit">Iniciar sesión</button>
+      
+      <div class="forgot-password-link">
+        <a (click)="openForgotPasswordDialog()">¿Olvidaste tu contraseña?</a>
+      </div>
     </form>
-  
-
+  </div>
 </div>
-  
