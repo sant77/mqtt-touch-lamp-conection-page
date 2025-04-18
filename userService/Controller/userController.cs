@@ -253,6 +253,89 @@ namespace userService.Controllers
             }
         }
 
+    // POST: /userservice/v1/user/request-password-reset
+    [HttpPost("request-password-reset")]
+    public async Task<IActionResult> RequestPasswordReset([FromBody] Dictionary<string, object> request)
+    {
+        try
+        {
+            if (!request.ContainsKey("email"))
+            {
+                return BadRequest(new { error = "El request debe contener 'email'." });
+            }
+
+            var email = request["email"].ToString();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+            {
+                // Por seguridad, no revelamos si el email existe o no
+                return Ok(new { message = "Si el email existe, se ha enviado un PIN de recuperación." });
+            }
+
+            // Generar un PIN de 6 dígitos
+            var random = new Random();
+            var resetToken = random.Next(100000, 999999).ToString();
+            
+            // Establecer expiración (15 minutos)
+            user.PasswordResetToken = resetToken;
+            user.ResetTokenExpires = DateTime.UtcNow.AddMinutes(15);
+            
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            // Enviar email con el PIN
+            var emailService = new EmailService();
+            await emailService.SendPasswordResetEmail(user.Email, resetToken);
+
+            return Ok(new { message = "Si el email existe, se ha enviado un PIN de recuperación." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al solicitar recuperación de contraseña.");
+            return StatusCode(500, new { error = "Ocurrió un error interno." });
+        }
+    }
+
+    // POST: /userservice/v1/user/reset-password
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] Dictionary<string, object> request)
+    {
+        try
+        {
+            if (!request.ContainsKey("email") || !request.ContainsKey("token") || !request.ContainsKey("newPassword"))
+            {
+                return BadRequest(new { error = "El request debe contener 'email', 'token' y 'newPassword'." });
+            }
+
+            var email = request["email"].ToString();
+            var token = request["token"].ToString();
+            var newPassword = request["newPassword"].ToString();
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null || user.PasswordResetToken != token || user.ResetTokenExpires < DateTime.UtcNow)
+            {
+                return BadRequest(new { error = "PIN inválido o expirado." });
+            }
+
+            // Actualizar contraseña
+            user.Password = HashPassword(newPassword);
+            user.PasswordResetToken = null;
+            user.ResetTokenExpires = null;
+            
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Contraseña actualizada correctamente." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al restablecer la contraseña.");
+            return StatusCode(500, new { error = "Ocurrió un error interno." });
+        }
+    }
+
 
         // Method to generate token
         private string GenerateJwtToken(User user)
