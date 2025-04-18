@@ -11,6 +11,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordDialogComponent } from './forgot-password-dialog/forgot-password-dialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-sign-in',
@@ -36,7 +37,8 @@ export class SignInComponent {
       private fb: FormBuilder,
       private myService: LoginUser,
       private router: Router, // Inyectar el Router
-      private toastr: ToastrService
+      private toastr: ToastrService,
+      private snackBar: MatSnackBar,
     
     ) {
       this.registerForm = this.fb.group({
@@ -51,19 +53,20 @@ export class SignInComponent {
         this.myService.login(formData).subscribe({
           next: (response) => {
             localStorage.setItem('token', response.token);
-            console.log('Registro exitoso', response);
+            
+            this.snackBar.open('Registro exitoso', 'Cerrar', { duration: 5000 })
             this.router.navigate(['/dashboard']); // Redirigir al dashboard
           },
           error: (err) => {
            // Manejo de errores según el código de estado HTTP
         if (err.status === 400 || err.status === 401) {
           const errorMessage = err.error?.error || 'Usuario o contraseña incorrecta'; // Si el backend envía un JSON con un campo `error`
-          this.toastr.error(errorMessage, '¡Error!');
+          this.snackBar.open(errorMessage, 'Cerrar', { duration: 5000 })
         } else if (err.status === 500) {
-          this.toastr.error('Ocurrió un error interno en el servidor. Inténtalo más tarde.', '¡Error!');
-        } else {
+          this.snackBar.open("Ocurrió un error interno en el servidor. Inténtalo más tarde.", 'Cerrar', { duration: 5000 })
           
-          this.toastr.error('Error desconocido. Inténtalo más tarde.', '¡Error!');
+        } else {
+          this.snackBar.open("Error desconocido. Inténtalo más tarde.", 'Cerrar', { duration: 5000 })
         }
           }
         });

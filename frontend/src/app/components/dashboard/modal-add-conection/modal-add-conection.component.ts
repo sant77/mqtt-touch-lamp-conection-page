@@ -100,7 +100,7 @@ export class ModalAddConectionComponent {
     this.http.get<any[]>(`${this.address_complete}user/all`, { headers }).subscribe(
       (data) => {
         this.users = data;
-        console.log(this.users);
+        
       },
       (error) => {
         console.error('Error al obtener los usuarios', error);
@@ -140,7 +140,7 @@ export class ModalAddConectionComponent {
     this.http.get<any[]>(`${this.address_complete}DeviceUserRelation/by-email?email=${userEmail}`, { headers }).subscribe(
       (data) => {
         this.devices = data;
-        console.log(this.devices);
+        
       },
       (error) => {
         console.error('Error al obtener los dispositivos', error);
@@ -171,7 +171,7 @@ export class ModalAddConectionComponent {
     this.http.get<any[]>(`${this.address_complete}DeviceUserRelation/by-user`, { headers }).subscribe(
       (data) => {
         this.devicesOwnUser = data;
-        console.log(this.devicesOwnUser);
+        
       },
       (error) => {
         console.error('Error al obtener los dispositivos', error);
@@ -182,7 +182,7 @@ export class ModalAddConectionComponent {
   onOwndeviceSelected(diveName: string): void {
 
     let deviceOwnId = this.devicesOwnUser.find(devices => devices.nombre === diveName);
-    console.log(deviceOwnId);
+    
     if (deviceOwnId) {
       this.formulario.patchValue({
         deviceOwnerId: deviceOwnId.id, // Actualizar el ID del usuario
@@ -216,7 +216,7 @@ export class ModalAddConectionComponent {
             this.http.post(`${this.address_complete}RelationUser/create-relation`, formValue, { headers })
               .subscribe(
                 (response) => {
-                  console.log('Relación creada exitosamente', response);
+                  
                   this.dialogRef.close(response); // Cerrar el modal y devolver la respuesta
                 },
                 (error) => {

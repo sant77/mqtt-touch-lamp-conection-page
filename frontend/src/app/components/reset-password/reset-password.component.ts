@@ -27,7 +27,7 @@ import { MatCardModule } from '@angular/material/card';
 })
 export class ResetPasswordComponent {
   resetForm: FormGroup;
- 
+  
   email: string | null = null;
   address = import.meta.env.NG_APP_ADDRESS;
   port_user = import.meta.env.NG_APP_PORT_USER;
@@ -37,7 +37,8 @@ export class ResetPasswordComponent {
     private fb: FormBuilder,
     private http: HttpClient,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.resetForm = this.fb.group({
       token: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
@@ -45,7 +46,13 @@ export class ResetPasswordComponent {
       confirmPassword: ['', Validators.required]
     }, { validator: this.passwordMatchValidator });
 
-
+    this.route.queryParams.subscribe(params => {
+      this.email = params['email'] || null;
+      if (!this.email) {
+        this.snackBar.open('Correo electrónico no proporcionado', 'Cerrar', { duration: 5000 });
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   passwordMatchValidator(formGroup: FormGroup) {
@@ -55,9 +62,9 @@ export class ResetPasswordComponent {
   }
 
   resetPassword(): void {
+    
     if (this.resetForm.valid && this.email) {
-     
-
+    
       const formValue = {
         email: this.email,
         token: this.resetForm.get('token')?.value,
@@ -71,7 +78,7 @@ export class ResetPasswordComponent {
             this.router.navigate(['/login']);
           },
           error: (error) => {
-            console.error('Error al restablecer contraseña', error);
+    
             this.snackBar.open('PIN inválido o expirado', 'Cerrar', { duration: 5000 });
           },
           complete: () => {

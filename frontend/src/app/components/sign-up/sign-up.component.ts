@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NavbarComponent } from '../home/navbar/navbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-sign-up',
@@ -33,7 +34,8 @@ export class SignUpComponent {
     private fb: FormBuilder,
     private myService: RegisterUser,
     private router: Router, // Inyectar el Router
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private snackBar: MatSnackBar,
   ) {
     this.registerForm = this.fb.group({
       name: ['', Validators.required],
@@ -59,20 +61,19 @@ export class SignUpComponent {
       // Enviar los datos al servicio
       this.myService.register(formData).subscribe({
         next: (response) => {
-          console.log('Registro exitoso', response);
-          this.toastr.success("Usuario creado", "¡Exito!")
+          this.snackBar.open("Usuario creado", 'Cerrar', { duration: 5000 })
           this.router.navigate(['/dashboard']); // Redirigir al dashboard
         },
         error: (err) => {
                // Manejo de errores según el código de estado HTTP
           if (err.status === 400 || err.status === 401) {
             const errorMessage = err.error?.error || 'El usuario ya existe.'; // Si el backend envía un JSON con un campo `error`
-            this.toastr.error(errorMessage, '¡Error!');
+            this.snackBar.open(errorMessage, 'Cerrar', { duration: 5000 })
+    
           } else if (err.status === 500) {
-            this.toastr.error('Ocurrió un error interno en el servidor. Inténtalo más tarde.', '¡Error!');
+            this.snackBar.open('Ocurrió un error interno en el servidor. Inténtalo más tarde.', 'Cerrar', { duration: 5000 })
           } else {
-            
-            this.toastr.error('Error desconocido. Inténtalo más tarde.', '¡Error!');
+            this.snackBar.open('Error desconocido. Inténtalo más tarde', 'Cerrar', { duration: 5000 })
           }
         }
       });
