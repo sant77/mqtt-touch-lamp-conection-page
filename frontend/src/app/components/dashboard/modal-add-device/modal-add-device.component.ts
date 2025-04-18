@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http'; // Import HttpClient
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-modal-add-device',
   standalone: true,
@@ -44,6 +45,7 @@ export class ModalAddDeviceComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ModalAddDeviceComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private http: HttpClient // Inyectamos HttpClient
@@ -101,11 +103,11 @@ export class ModalAddDeviceComponent implements OnInit {
         .pipe(takeUntil(this.destroy$))
         .subscribe(
           (response) => {
-            
+            this.snackBar.open("Se agregó el dispositivo correctamente.", 'Cerrar', { duration: 5000 })
             this.dialogRef.close(response); // Cerrar el modal y devolver la respuesta
           },
           (error) => {
-            console.error('Error al crear la relación', error);
+            this.snackBar.open("Error al agregar el dispositivo.", 'Cerrar', { duration: 5000 });
             // Mostrar mensaje de error en la UI
           }
         );

@@ -16,6 +16,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-modal-add-conection',
@@ -55,6 +56,7 @@ export class ModalAddConectionComponent {
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
+    private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ModalAddConectionComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -216,11 +218,11 @@ export class ModalAddConectionComponent {
             this.http.post(`${this.address_complete}RelationUser/create-relation`, formValue, { headers })
               .subscribe(
                 (response) => {
-                  
+                  this.snackBar.open("Se agregó la conexión exitosamente.", 'Cerrar', { duration: 5000 })
                   this.dialogRef.close(response); // Cerrar el modal y devolver la respuesta
                 },
                 (error) => {
-                  console.error('Error al crear la relación', error);
+                  this.snackBar.open("Error al crear la relación", 'Cerrar', { duration: 5000 })
                   // Mostrar mensaje de error en la UI
                 }
               );
