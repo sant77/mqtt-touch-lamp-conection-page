@@ -16,6 +16,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-modal-add-conection',
@@ -55,6 +56,7 @@ export class ModalAddConectionComponent {
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
+    private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ModalAddConectionComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -100,7 +102,7 @@ export class ModalAddConectionComponent {
     this.http.get<any[]>(`${this.address_complete}user/all`, { headers }).subscribe(
       (data) => {
         this.users = data;
-        console.log(this.users);
+        
       },
       (error) => {
         console.error('Error al obtener los usuarios', error);
@@ -140,7 +142,7 @@ export class ModalAddConectionComponent {
     this.http.get<any[]>(`${this.address_complete}DeviceUserRelation/by-email?email=${userEmail}`, { headers }).subscribe(
       (data) => {
         this.devices = data;
-        console.log(this.devices);
+        
       },
       (error) => {
         console.error('Error al obtener los dispositivos', error);
@@ -171,7 +173,7 @@ export class ModalAddConectionComponent {
     this.http.get<any[]>(`${this.address_complete}DeviceUserRelation/by-user`, { headers }).subscribe(
       (data) => {
         this.devicesOwnUser = data;
-        console.log(this.devicesOwnUser);
+        
       },
       (error) => {
         console.error('Error al obtener los dispositivos', error);
@@ -182,7 +184,7 @@ export class ModalAddConectionComponent {
   onOwndeviceSelected(diveName: string): void {
 
     let deviceOwnId = this.devicesOwnUser.find(devices => devices.nombre === diveName);
-    console.log(deviceOwnId);
+    
     if (deviceOwnId) {
       this.formulario.patchValue({
         deviceOwnerId: deviceOwnId.id, // Actualizar el ID del usuario
@@ -216,11 +218,11 @@ export class ModalAddConectionComponent {
             this.http.post(`${this.address_complete}RelationUser/create-relation`, formValue, { headers })
               .subscribe(
                 (response) => {
-                  console.log('Relación creada exitosamente', response);
+                  this.snackBar.open("Se agregó la conexión exitosamente.", 'Cerrar', { duration: 5000 })
                   this.dialogRef.close(response); // Cerrar el modal y devolver la respuesta
                 },
                 (error) => {
-                  console.error('Error al crear la relación', error);
+                  this.snackBar.open("Error al crear la relación", 'Cerrar', { duration: 5000 })
                   // Mostrar mensaje de error en la UI
                 }
               );

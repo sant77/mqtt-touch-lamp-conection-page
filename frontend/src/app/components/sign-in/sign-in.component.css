@@ -1,59 +1,196 @@
-/* Estilo base para centrar el formulario */
-.container {
+.login-container {
   display: flex;
-  flex-direction: column; /* Alinea los elementos del formulario verticalmente */
-  justify-content: center; /* Centra el contenido verticalmente */
-  align-items: center; /* Centra el contenido horizontalmente */
-  height: 100vh; /* Toma el 100% de la altura de la ventana */
-  background-color: #0f0e17; /* Fondo claro para mejorar la legibilidad */
-  min-width: 100%;
- 
+  min-height: calc(100vh - 64px);
+  background: radial-gradient(circle at center, rgba(15, 14, 23, 0.8), rgba(15, 14, 23, 1));
+  color: #fffffe;
+  padding: 1rem;
+  box-sizing: border-box;
+  align-items: center;
 }
 
-form {
-  width: 100%;
+.welcome-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+  max-width: 600px;
+  
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 1rem;
+    color: #fffffe;
+  }
+  
+  p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: #a7a9be;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+  }
+}
+
+.form-overlay {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.form-section {
   text-align: center;
-  max-width: 400px; /* Define un ancho máximo para el formulario */
-  padding: 20px;
-  border: 1px solid #d7e3ff; /* Borde con color similar al tema */
-  border-radius: 8px; /* Bordes redondeados */
-  background-color: #fffffe; /* Fondo blanco */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  color: #0f0e17;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
 }
 
-mat-form-field {
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   width: 100%;
 }
-  .cta-button {
-    padding: 0.8rem 2rem;
-    font-size: 1rem;
-    color: #fffffe;
-    background-color: #ff8906;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-  }
-  
-  .cta-button:hover {
-    background-color: #0056b3;
-  }
 
-  .cta-button2 {
-    padding: 0.8rem 2rem;
-    font-size: 0.8rem;
-    color: #fffffe;
-    background-color: #ff8906;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.full-width {
+  width: 100%;
+}
 
+
+.learn-more-btn {
+  padding: 0.8rem 2rem;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  color: #fffffe;
+  background-color: #ff8906;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
+  max-width: 50%;
+}
+
+.learn-more-btn:hover {
+  background-color: #0056b3;
+}
+
+.cta-button2 {
+  padding: 0.8rem 2rem;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  color: #fffffe;
+  background-color: #673ab7;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
+  max-width: 100%;
+}
+
+.cta-button2:hover {
+  background-color: #0056b3;
+}
+
+.cta-button {
+  padding: 0.8rem 2rem;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  color: #fffffe;
+  background-color: #ff8906;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
+  max-width: 100%;
+}
+
+.cta-button:hover {
+  background-color: #0056b3;
+}
+
+.forgot-password-link {
+  text-align: center;
+  margin-top: 1rem;
+  
+  a {
+    color: #a7a9be;
+    text-decoration: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+
+.custom-input.mat-form-field {
+  color: #fffffe;
+}
+
+.custom-input .mat-form-field-label {
+  color: #a7a9be !important;
+}
+
+.custom-input .mat-input-element {
+  color: #fffffe !important;
+}
+
+.custom-input .mat-form-field-outline {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.custom-input.mat-focused .mat-form-field-outline-thick {
+  color: #ff8906 !important;
+}
+
+.custom-input .mat-form-field-outline-start,
+.custom-input .mat-form-field-outline-end,
+.custom-input .mat-form-field-outline-gap {
+  border-width: 1px !important;
+}
+
+
+/* Responsive - Móviles */
+@media screen and (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+    padding: 1rem;
   }
   
-  .cta-button2:hover {
-    background-color: #0056b3;
+  .welcome-section {
+    order: 2; /* Mueve la sección de bienvenida abajo */
+    padding: 1.5rem;
+    max-width: 100%;
+    text-align: center;
+    
+    .learn-more-btn {
+      align-self: center; /* Centra el botón en móviles */
+    }
   }
   
+  .form-overlay {
+    order: 1; /* Mueve el formulario arriba */
+    padding: 1rem;
+    width: 80%;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-section {
+    padding: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .welcome-section, .form-overlay {
+    padding: 1rem;
+  }
+  
+  .form-section {
+    padding: 1.25rem;
+  }
+}

@@ -29,6 +29,9 @@ namespace userService.Models
 
         public string  DeviceToken { get; set; }
 
+        public string? PasswordResetToken { get; set; }
+        public DateTime? ResetTokenExpires { get; set; }
+
          // Fecha de registro
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
