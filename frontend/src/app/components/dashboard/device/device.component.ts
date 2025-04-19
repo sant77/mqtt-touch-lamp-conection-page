@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { DashboardService } from '../dashboard-service';
 import { MqttService } from '../mqtt-service';
 import { ModalAddDeviceComponent } from '../modal-add-device/modal-add-device.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 export interface UserDeviceRelation {
@@ -60,6 +61,7 @@ export class DeviceComponent {
               private dashboardService: DashboardService, 
               private router: Router, 
               private mqttService:MqttService,
+              private snackBar: MatSnackBar
               ) {}
 
   ngOnInit(): void {
@@ -125,10 +127,10 @@ export class DeviceComponent {
     const index = this.dataSourceDevice.indexOf(row);
     this.mqttService.sendMqttMessage(this.dataSourceDevice[index]["id"], "On").subscribe(
       () => {
-        console.log("Mensaje enviado.")
+        this.snackBar.open("Mensaje Encendido enviado.", 'Cerrar', { duration: 5000 });
       },
       (error) => {
-        console.error("Error al enviar mensaje.", error);
+        this.snackBar.open("Error al enviar mensaje.", 'Cerrar', { duration: 5000 });
       }
     );
   }
@@ -137,9 +139,10 @@ export class DeviceComponent {
     const index = this.dataSourceDevice.indexOf(row);
     this.mqttService.sendMqttMessage(this.dataSourceDevice[index]["id"], "Off").subscribe(
       () => {
+        this.snackBar.open("Mensaje Apagado enviado.", 'Cerrar', { duration: 5000 });
       },
       (error) => {
-        console.error("Error al enviar mensaje.", error);
+        this.snackBar.open("Error al enviar mensaje.", 'Cerrar', { duration: 5000 });
       }
     );
 }

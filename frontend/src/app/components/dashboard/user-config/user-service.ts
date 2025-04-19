@@ -27,5 +27,11 @@ export class UserService {
     return this.http.get<any[]>(`${this.address_complete}user/by_token`, { headers: this.getHeaders() });
   }
 
+  updateDeviceToken(): Observable<any> {
+    return this.http.put<any>(
+      `${this.address_complete}user/update-device-token`, 
+      {}, 
+      { headers: this.getHeaders() }
+    );}
   
   }

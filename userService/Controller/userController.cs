@@ -336,6 +336,36 @@ namespace userService.Controllers
         }
     }
 
+    [Authorize]
+    [HttpPut("update-device-token")]
+    public async Task<IActionResult> UpdateDeviceToken()
+    {
+        try
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+            {
+                return NotFound(new { error = "Usuario no encontrado" });
+            }
+
+            // Generar nuevo token
+            user.DeviceToken = Guid.NewGuid().ToString();
+            user.UpdatedAt = DateTime.UtcNow;
+
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { deviceToken = user.DeviceToken });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al actualizar el device token");
+            return StatusCode(500, new { error = "Ocurrió un error interno." });
+        }
+    }
+
 
         // Method to generate token
         private string GenerateJwtToken(User user)
